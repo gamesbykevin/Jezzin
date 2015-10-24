@@ -83,7 +83,9 @@ public class Assets
     public enum ImageGameKey
     {
         Balls,
-        Pause
+        Exit,
+        Pause,
+        Player
     }
     
     /**

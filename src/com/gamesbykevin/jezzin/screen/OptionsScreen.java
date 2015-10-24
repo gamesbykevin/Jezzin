@@ -29,6 +29,18 @@ public class OptionsScreen implements Screen, Disposable
     //list of buttons for the sound
     private List<Button> sounds;
     
+    //list of buttons for ball collision
+    private List<Button> collisions;
+    
+    //list of buttons for ball size
+    private List<Button> sizes;
+    
+    //is collision enabled
+    private boolean collision = false;
+    
+    //our size selection
+    private int size = 0;
+    
     //the go back button
     private Button back;
     
@@ -68,7 +80,6 @@ public class OptionsScreen implements Screen, Disposable
         button.setY(y);
         button.updateBounds();
         button.positionText(paint);
-        
         this.sounds.add(button);
         
         button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
@@ -77,8 +88,72 @@ public class OptionsScreen implements Screen, Disposable
         button.setY(y);
         button.updateBounds();
         button.positionText(paint);
-        
         this.sounds.add(button);
+        
+        //add collision option
+        this.collisions = new ArrayList<Button>();
+        
+        y += MainScreen.BUTTON_Y_INCREMENT;
+        button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
+        button.setText("Ball Collision: Disabled");
+        button.setX(MainScreen.BUTTON_X);
+        button.setY(y);
+        button.updateBounds();
+        button.positionText(paint);
+        this.collisions.add(button);
+        
+        button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
+        button.setText("Ball Collision: Enabled");
+        button.setX(MainScreen.BUTTON_X);
+        button.setY(y);
+        button.updateBounds();
+        button.positionText(paint);
+        this.collisions.add(button);
+        
+        //add collision option
+        this.sizes = new ArrayList<Button>();
+        
+        y += MainScreen.BUTTON_Y_INCREMENT;
+        button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
+        button.setText("Size: Medium");
+        button.setX(MainScreen.BUTTON_X);
+        button.setY(y);
+        button.updateBounds();
+        button.positionText(paint);
+        this.sizes.add(button);
+        
+        button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
+        button.setText("Size: Large");
+        button.setX(MainScreen.BUTTON_X);
+        button.setY(y);
+        button.updateBounds();
+        button.positionText(paint);
+        this.sizes.add(button);
+        
+        button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
+        button.setText("Size: X-Large");
+        button.setX(MainScreen.BUTTON_X);
+        button.setY(y);
+        button.updateBounds();
+        button.positionText(paint);
+        this.sizes.add(button);
+        
+        button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
+        button.setText("Size: Very Small");
+        button.setX(MainScreen.BUTTON_X);
+        button.setY(y);
+        button.updateBounds();
+        button.positionText(paint);
+        this.sizes.add(button);
+        
+        button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
+        button.setText("Size: Small");
+        button.setX(MainScreen.BUTTON_X);
+        button.setY(y);
+        button.updateBounds();
+        button.positionText(paint);
+        this.sizes.add(button);
+        
         
         y += MainScreen.BUTTON_Y_INCREMENT;
         //the back button
@@ -130,10 +205,61 @@ public class OptionsScreen implements Screen, Disposable
                     return false;
                 }
             }
+            
+            for (Button button : collisions)
+            {
+                if (button.contains(x, y))
+                {
+                    //flip setting
+                    collision = !collision;
+                    
+                    //play sound effect
+                    //Audio.play(Assets.AudioKey.Selection);
+                    
+                    //exit loop
+                    return false;
+                }
+            }
+            
+            for (Button button : sizes)
+            {
+                if (button.contains(x, y))
+                {
+                    //change setting
+                    size++;
+                    
+                    if (size >= sizes.size())
+                        size = 0;
+                    
+                    //play sound effect
+                    //Audio.play(Assets.AudioKey.Selection);
+                    
+                    //exit loop
+                    return false;
+                }
+            }
         }
         
         //return true
         return true;
+    }
+    
+    /**
+     * Is ball collision enabled
+     * @return true = yes, false = no
+     */
+    public boolean hasCollision()
+    {
+        return this.collision;
+    }
+    
+    /**
+     * Get the ball size
+     * @return The ball size index
+     */
+    public int getBallSize()
+    {
+        return this.size;
     }
     
     @Override
@@ -150,6 +276,8 @@ public class OptionsScreen implements Screen, Disposable
         
         //draw the menu buttons
         sounds.get(Audio.isAudioEnabled() ? 1 : 0).render(canvas, paint);
+        collisions.get(collision ? 1 : 0).render(canvas, paint);
+        sizes.get(getBallSize()).render(canvas, paint);
         
         //render back button
         back.render(canvas, paint);
@@ -162,6 +290,36 @@ public class OptionsScreen implements Screen, Disposable
         {
             back.dispose();
             back = null;
+        }
+        
+        if (collisions != null)
+        {
+            for (Button button : collisions)
+            {
+                if (button != null)
+                {
+                    button.dispose();
+                    button = null;
+                }
+            }
+            
+            collisions.clear();
+            collisions = null;
+        }
+        
+        if (sizes != null)
+        {
+            for (Button button : sizes)
+            {
+                if (button != null)
+                {
+                    button.dispose();
+                    button = null;
+                }
+            }
+            
+            sizes.clear();
+            sizes = null;
         }
         
         if (sounds != null)

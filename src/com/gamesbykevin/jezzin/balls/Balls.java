@@ -5,6 +5,8 @@ import com.gamesbykevin.androidframework.anim.Animation;
 import com.gamesbykevin.androidframework.base.Entity;
 import com.gamesbykevin.androidframework.resources.Images;
 import com.gamesbykevin.jezzin.assets.Assets;
+import com.gamesbykevin.jezzin.boundaries.Boundary;
+import com.gamesbykevin.jezzin.game.Game;
 import com.gamesbykevin.jezzin.panel.GamePanel;
 
 import java.util.ArrayList;
@@ -22,9 +24,13 @@ public class Balls extends Entity implements IBalls
     private static final int DEFAULT_ANIMATION_DIMENSION = 64;
     
     /**
-     * The default size of a ball
+     * The sizes of the balls
      */
-    public static final int DEFAULT_BALL_DIMENSION = 64;
+    public static final int BALL_DIMENSION_MEDIUM = 64;
+    public static final int BALL_DIMENSION_LARGE = 80;
+    public static final int BALL_DIMENSION_XLARGE = 96;
+    public static final int BALL_DIMENSION_XSMALL = 32;
+    public static final int BALL_DIMENSION_SMALL = 48;
     
     /**
      * The maximum velocity for the balls
@@ -56,13 +62,19 @@ public class Balls extends Entity implements IBalls
         Ball19, Ball20, Ball21, Ball22, Ball23, Ball24, 
     }
     
-    public Balls()
+    //our game reference object
+    private final Game game;
+    
+    public Balls(final Game game)
     {
+        //store our reference object
+        this.game = game;
+        
         //create new list
         this.balls = new ArrayList<Ball>();
         
         //set default dimension
-        setDimension(DEFAULT_BALL_DIMENSION);
+        setDimension(BALL_DIMENSION_MEDIUM);
         
         //set ball collision true
         setCollision(true);
@@ -159,15 +171,19 @@ public class Balls extends Entity implements IBalls
             ball.setHeight(getDimension());
             
             //pick random location
-            ball.setX(GamePanel.RANDOM.nextInt(GamePanel.WIDTH));
-            ball.setY(GamePanel.RANDOM.nextInt(GamePanel.HEIGHT));
+            ball.setX(GamePanel.RANDOM.nextInt(GamePanel.WIDTH - getDimension()) + getDimension());
+            ball.setY(GamePanel.RANDOM.nextInt(GamePanel.HEIGHT - getDimension()) + getDimension());
             
-            //continue until this ball does not collide with another
-            while (getBall(ball) != null)
+            //if we want to apply collision
+            if (hasCollision())
             {
-                //pick random location
-                ball.setX(GamePanel.RANDOM.nextInt(GamePanel.WIDTH));
-                ball.setY(GamePanel.RANDOM.nextInt(GamePanel.HEIGHT));
+                //continue until this ball does not collide with another
+                while (getBall(ball) != null)
+                {
+                    //pick random location
+                    ball.setX(GamePanel.RANDOM.nextInt(GamePanel.WIDTH));
+                    ball.setY(GamePanel.RANDOM.nextInt(GamePanel.HEIGHT));
+                }
             }
             
             //pick random velocity
@@ -198,12 +214,8 @@ public class Balls extends Entity implements IBalls
                 //skip if the ball doesn't exist
                 if (ball == null)
                     continue;
-
-                //calculate half the dimension
-                final double h = ball.getHeight() / 2;
-                final double w = ball.getWidth() / 2;
                 
-                //if collision is enabled, check for it
+                //is the collision check option enabled
                 if (hasCollision())
                 {
                     //check collision with another ball
@@ -217,39 +229,74 @@ public class Balls extends Entity implements IBalls
                         final double dy1 = ball.getDY();
                         final double dx2 = tmp.getDX();
                         final double dy2 = tmp.getDY();
-
+                        
                         //switch velocity
                         ball.setDX(dx2);
                         ball.setDY(dy2);
                         tmp.setDX(dx1);
                         tmp.setDY(dy1);
+                        
+                        //move the balls
+                        ball.update();
+                        tmp.update();
                     }
                 }
                 
+                //calculate half the dimension
+                final double h = ball.getHeight() / 2;
+                final double w = ball.getWidth() / 2;
+
+                //get the assigned boundary
+                Boundary boundary = game.getBoundaries().getBoundary(ball.getIndex());
+
                 //manage x-velocity
                 if (ball.getDX() < 0)
                 {
-                    if (ball.getX() < w)
+                    if (ball.getX() < boundary.getRect().left + w)
+                    {
+                        //flip velocity
                         ball.setDX(-ball.getDX());
+
+                        //adjust coordinates
+                        ball.setX(boundary.getRect().left + w);
+                    }
                 }
                 else if (ball.getDX() > 0)
                 {
-                    if (ball.getX() > GamePanel.WIDTH - w)
+                    if (ball.getX() > boundary.getRect().right - w)
+                    {
+                        //flip velocity
                         ball.setDX(-ball.getDX());
+
+                        //adjust coordinates
+                        ball.setX(boundary.getRect().right - w);
+                    }
                 }
-                
+
                 //manage y-velocity
                 if (ball.getDY() < 0)
                 {
-                    if (ball.getY() < h)
+                    if (ball.getY() < boundary.getRect().top + h)
+                    {
+                        //flip velocity
                         ball.setDY(-ball.getDY());
+
+                        //adjust coordinates
+                        ball.setY(boundary.getRect().top + h);
+                    }
                 }
                 else if (ball.getDY() > 0)
                 {
-                    if (ball.getY() > GamePanel.HEIGHT - h)
+                    if (ball.getY() > boundary.getRect().bottom - h)
+                    {
+                        //flip velocity
                         ball.setDY(-ball.getDY());
+
+                        //adjust coordinates
+                        ball.setY(boundary.getRect().bottom - h);
+                    }
                 }
-                
+
                 //update the current ball
                 ball.update();
             }
@@ -257,7 +304,8 @@ public class Balls extends Entity implements IBalls
     }
     
     /**
-     * Get the ball that is in collision
+     * Get the ball that is in collision.<br>
+     * The ball won't have collision with another ball if they are assigned a different boundary index
      * @param ball The ball we want to check if it has collision
      * @return The ball in collision, if none found null is returned
      */
@@ -269,8 +317,12 @@ public class Balls extends Entity implements IBalls
             if (ball.hasId(tmp))
                 continue;
             
+            //don't check balls in a different boundary
+            if (ball.getIndex() != tmp.getIndex())
+                continue;
+            
             //if the ball is close enough, we have collision
-            if (ball.getDistance(tmp) <= ball.getWidth())
+            if (ball.getDistance(tmp) < ball.getWidth())
                 return tmp;
         }
         
@@ -345,27 +397,6 @@ public class Balls extends Entity implements IBalls
             
             balls.clear();
             balls = null;
-        }
-    }
-    
-    /**
-     * Ball will inherit from Entity
-     */
-    public class Ball extends Entity
-    {
-        private final Type type;
-        
-        private Ball(final Type type)
-        {
-            super();
-            
-            //assign type
-            this.type = type;
-        }
-        
-        private Type getType()
-        {
-            return this.type;
         }
     }
 }

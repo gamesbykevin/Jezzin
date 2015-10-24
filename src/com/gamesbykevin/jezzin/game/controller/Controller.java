@@ -30,9 +30,18 @@ public class Controller implements IController
     //our game object reference
     private final Game game;
     
-    //location of reset button
-    private final static int PAUSE_X = GamePanel.WIDTH - 64;
-    private final static int PAUSE_Y = 0;
+    /**
+     * The dimensions of the buttons, to be rendered to the user
+     */
+    private final static int BUTTON_DIMENSION = 32;
+
+    //location of exit button
+    private final static int EXIT_X = GamePanel.WIDTH - (BUTTON_DIMENSION * 4);
+    private final static int EXIT_Y = 16;
+    
+    //location of pause button
+    private final static int PAUSE_X = GamePanel.WIDTH - (BUTTON_DIMENSION * 2);
+    private final static int PAUSE_Y = EXIT_Y;
     
     /**
      * Default Constructor
@@ -45,23 +54,33 @@ public class Controller implements IController
         
         //create temp list
         List<Assets.ImageGameKey> tmp = new ArrayList<Assets.ImageGameKey>();
+        
+        //add button unique key to list
         tmp.add(Assets.ImageGameKey.Pause);
+        tmp.add(Assets.ImageGameKey.Exit);
         
         //create new list of buttons
         this.buttons = new HashMap<Assets.ImageGameKey, Button>();
         
-        //add button controls
+        //add button
         for (Assets.ImageGameKey key : tmp)
         {
             this.buttons.put(key, new Button(Images.getImage(key)));
         }
         
+        //update location of our buttons
         this.buttons.get(Assets.ImageGameKey.Pause).setX(PAUSE_X);
         this.buttons.get(Assets.ImageGameKey.Pause).setY(PAUSE_Y);
+        this.buttons.get(Assets.ImageGameKey.Exit).setX(EXIT_X);
+        this.buttons.get(Assets.ImageGameKey.Exit).setY(EXIT_Y);
         
-        //assign boundary
         for (Assets.ImageGameKey key : tmp)
         {
+            //set the dimension of the button
+            this.buttons.get(key).setWidth(BUTTON_DIMENSION);
+            this.buttons.get(key).setHeight(BUTTON_DIMENSION);
+            
+            //update the boundary
             this.buttons.get(key).updateBounds();
         }
     }
@@ -93,6 +112,14 @@ public class Controller implements IController
             {
                 //change the state to paused
                 getGame().getMainScreen().setState(MainScreen.State.Paused);
+                
+                //event was applied
+                return true;
+            }
+            else if (buttons.get(Assets.ImageGameKey.Exit).contains(x, y))
+            {
+                //change to the exit confirm screen
+                getGame().getMainScreen().setState(MainScreen.State.Exit);
                 
                 //event was applied
                 return true;
@@ -136,7 +163,11 @@ public class Controller implements IController
         //draw the buttons
         if (buttons != null)
         {
-            buttons.get(Assets.ImageGameKey.Pause).render(canvas);
+            for (Button button : buttons.values())
+            {
+                if (button != null)
+                    button.render(canvas);
+            }
         }
     }
 }

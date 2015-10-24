@@ -39,6 +39,11 @@ public class ExitScreen implements Screen, Disposable
     //all of the buttons for the player to control
     private HashMap<Assets.ImageMenuKey, Button> buttons;
     
+    /**
+     * The dimensions of the buttons
+     */
+    private static final int BUTTON_DIMENSION = 96;
+    
     public ExitScreen(final MainScreen screen)
     {
         //store our parent reference
@@ -66,20 +71,19 @@ public class ExitScreen implements Screen, Disposable
         this.buttons.put(Assets.ImageMenuKey.Confirm, new Button(Images.getImage(Assets.ImageMenuKey.Confirm)));
         
         //position
-        final int x = 50;
-        final int y = 450;
+        final int y = (GamePanel.HEIGHT / 2) + BUTTON_DIMENSION;
         
         //position buttons
-        this.buttons.get(Assets.ImageMenuKey.Confirm).setX(x);
+        this.buttons.get(Assets.ImageMenuKey.Confirm).setX((BUTTON_DIMENSION / 2));
         this.buttons.get(Assets.ImageMenuKey.Confirm).setY(y);
-        this.buttons.get(Assets.ImageMenuKey.Cancel).setX(x + 273);
+        this.buttons.get(Assets.ImageMenuKey.Cancel).setX(GamePanel.WIDTH - BUTTON_DIMENSION - (BUTTON_DIMENSION / 2));
         this.buttons.get(Assets.ImageMenuKey.Cancel).setY(y);
         
-        //adjust the dimensions of each image
+        //set the bounds of each button
         for (Button button : buttons.values())
         {
-            button.setWidth(button.getWidth() * .75);
-            button.setHeight(button.getHeight() * .75);
+            button.setWidth(BUTTON_DIMENSION);
+            button.setHeight(BUTTON_DIMENSION);
             button.updateBounds();
         }
     }

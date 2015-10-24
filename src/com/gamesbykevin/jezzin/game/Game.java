@@ -10,7 +10,9 @@ import com.gamesbykevin.androidframework.io.storage.Internal;
 
 import com.gamesbykevin.jezzin.assets.Assets;
 import com.gamesbykevin.jezzin.balls.Balls;
+import com.gamesbykevin.jezzin.boundaries.Boundaries;
 import com.gamesbykevin.jezzin.game.controller.Controller;
+import com.gamesbykevin.jezzin.player.Player;
 import com.gamesbykevin.jezzin.screen.MainScreen;
 
 /**
@@ -33,6 +35,12 @@ public final class Game implements IGame
     
     //our balls
     private Balls balls;
+
+    //the boundaries in the game
+    private Boundaries boundaries;
+    
+    //the player in the game
+    private Player player;
     
     /**
      * Text delimeter used to parse internal storage data for each level
@@ -54,7 +62,27 @@ public final class Game implements IGame
         this.paint.setTextSize(24f);
         this.paint.setColor(Color.WHITE);
         
-        this.balls = new Balls();
+        //create ball container
+        this.balls = new Balls(this);
+        
+        //create new controller
+        this.controller = new Controller(this);
+        
+        //create the player
+        this.player = new Player(this);
+        
+        //create the boundaries container
+        this.boundaries = new Boundaries(this);
+    }
+    
+    public Player getPlayer()
+    {
+        return this.player;
+    }
+    
+    public Boundaries getBoundaries()
+    {
+        return this.boundaries;
     }
     
     /**
@@ -94,7 +122,44 @@ public final class Game implements IGame
         //create our storage object
         //this.storage = new Internal("TEST", screen.getPanel().getActivity());
         
+        //assign collision setting
+        getBalls().setCollision(getMainScreen().getScreenOptions().hasCollision());        
+        
+        //assign ball size
+        switch (getMainScreen().getScreenOptions().getBallSize())
+        {
+            case 0:
+                getBalls().setDimension(Balls.BALL_DIMENSION_MEDIUM);
+                break;
+            
+            case 1:
+                getBalls().setDimension(Balls.BALL_DIMENSION_LARGE);
+                break;
+            
+            case 2:
+                getBalls().setDimension(Balls.BALL_DIMENSION_XLARGE);
+                break;
+            
+            case 3:
+                getBalls().setDimension(Balls.BALL_DIMENSION_XSMALL);
+                break;
+            
+            case 4:
+                getBalls().setDimension(Balls.BALL_DIMENSION_SMALL);
+                break;
+            
+            default:
+                throw new Exception("Size not accounted here: " + getMainScreen().getScreenOptions().getBallSize());
+        }
+        
+        //reset the ball container with the specified number of balls
         getBalls().reset(5);
+        
+        //reset player
+        getPlayer().reset();
+        
+        //reset boundaries
+        getBoundaries().reset();
     }
     
     /**
@@ -131,13 +196,11 @@ public final class Game implements IGame
         //only update game if no controller buttons were clicked
         if (getController() != null && !getController().updateMotionEvent(event, x, y))
         {
-            if (event.getAction() == MotionEvent.ACTION_DOWN)
+            //makre sure draw isn't in progress
+            if (getBoundaries() != null && !getBoundaries().hasDraw())
             {
-                
-            }
-            else if (event.getAction() == MotionEvent.ACTION_UP)
-            {
-                
+                if (getPlayer() != null)
+                    getPlayer().updateMotionEvent(event, x, y);
             }
         }
         else
@@ -152,10 +215,15 @@ public final class Game implements IGame
      */
     public void update() throws Exception
     {
+        if (getBoundaries() != null)
+            getBoundaries().update();
+        
+        if (getPlayer() != null)
+            getPlayer().update();
+        
         if (getBalls() != null)
-        {
             getBalls().update();
-        }
+        
         
         /*
         //save information to internal storage
@@ -175,6 +243,18 @@ public final class Game implements IGame
     @Override
     public void dispose()
     {
+        if (boundaries != null)
+        {
+            boundaries.dispose();
+            boundaries = null;
+        }
+        
+        if (player != null)
+        {
+            player.dispose();
+            player = null;
+        }
+        
         if (controller != null)
         {
             controller.dispose();
@@ -198,15 +278,19 @@ public final class Game implements IGame
      */
     public void render(final Canvas canvas) throws Exception
     {
+        //fill in black background
+        canvas.drawColor(Color.WHITE);
+        
+        if (getBoundaries() != null)
+            getBoundaries().render(canvas);
+        
         if (getController() != null)
-        {
-            //draw controller
             getController().render(canvas);
-        }
         
         if (getBalls() != null)
-        {
             getBalls().render(canvas);
-        }
+        
+        if (getPlayer() != null)
+            getPlayer().render(canvas);
     }
 }
