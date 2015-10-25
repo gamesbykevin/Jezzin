@@ -61,11 +61,11 @@ public class PauseScreen implements Screen, Disposable
     /**
      * Set the previous state.<br>
      * We need this, so when un-pause we know where to go back
-     * @param previous The previous state
+     * @param previous The previous state, can't be set to paused
      */
     public void setStatePrevious(final MainScreen.State previous)
     {
-        //only store if not pause
+        //only store if not paused
         if (previous != MainScreen.State.Paused)
             this.previous = previous;
     }

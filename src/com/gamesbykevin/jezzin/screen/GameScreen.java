@@ -5,7 +5,9 @@ import android.view.MotionEvent;
 import com.gamesbykevin.androidframework.resources.Disposable;
 import com.gamesbykevin.androidframework.screen.Screen;
 import com.gamesbykevin.jezzin.assets.Assets;
+import com.gamesbykevin.jezzin.balls.Balls;
 import com.gamesbykevin.jezzin.game.Game;
+import com.gamesbykevin.jezzin.player.Player;
 
 /**
  * The game screen that contains the game
@@ -41,8 +43,29 @@ public class GameScreen implements Screen, Disposable
         if (getGame() == null)
             this.game = new Game(screen);
         
-        //reset the game
-        getGame().reset();
+        //set the mode description
+        switch (screen.getScreenOptions().getModeIndex())
+        {
+            case Player.MODE_INDEX_CASUAL:
+            default:
+                getGame().getPlayer().setModeDesc(Player.MODE_DESC_CASUAL);
+                break;
+                
+            case Player.MODE_INDEX_SURVIVIAL:
+                getGame().getPlayer().setModeDesc(Player.MODE_DESC_SURVIVAL);
+                break;
+                
+            case Player.MODE_INDEX_TIMED:
+                getGame().getPlayer().setModeDesc(Player.MODE_DESC_TIMED);
+                break;
+                
+            case Player.MODE_INDEX_CHALLENGE:
+                getGame().getPlayer().setModeDesc(Player.MODE_DESC_CHALLENGE);
+                break;
+        }
+        
+        //reset the game at the user specified level
+        getGame().reset(screen.getScreenOptions().getLevelIndex() + 1);
     }
     
     /**

@@ -5,7 +5,7 @@ import com.gamesbykevin.androidframework.anim.Animation;
 import com.gamesbykevin.androidframework.base.Entity;
 import com.gamesbykevin.androidframework.resources.Images;
 import com.gamesbykevin.jezzin.assets.Assets;
-import com.gamesbykevin.jezzin.boundaries.Boundary;
+import com.gamesbykevin.jezzin.boundaries.Boundaries;
 import com.gamesbykevin.jezzin.game.Game;
 import com.gamesbykevin.jezzin.panel.GamePanel;
 
@@ -16,7 +16,7 @@ import java.util.List;
  * This class will manage the balls in the game
  * @author GOD
  */
-public class Balls extends Entity implements IBalls
+public final class Balls extends Entity implements IBalls
 {
     /**
      * The default size of a ball animation
@@ -24,23 +24,25 @@ public class Balls extends Entity implements IBalls
     private static final int DEFAULT_ANIMATION_DIMENSION = 64;
     
     /**
-     * The sizes of the balls
+     * The size of the balls
      */
-    public static final int BALL_DIMENSION_MEDIUM = 64;
-    public static final int BALL_DIMENSION_LARGE = 80;
-    public static final int BALL_DIMENSION_XLARGE = 96;
-    public static final int BALL_DIMENSION_XSMALL = 32;
-    public static final int BALL_DIMENSION_SMALL = 48;
+    public static final int BALL_DIMENSION = 32;
     
     /**
      * The maximum velocity for the balls
      */
-    private static final double MAX_VELOCITY = (double)DEFAULT_ANIMATION_DIMENSION / 5.0;
+    public static final double VELOCITY_MAX = (double)BALL_DIMENSION / 4.0;
     
     /**
      * The minimum velocity for the balls
      */
-    private static final double MIN_VELOCITY = (double)DEFAULT_ANIMATION_DIMENSION / 20.0;
+    public static final double VELOCITY_MIN = (double)BALL_DIMENSION / 20.0;
+    
+    //the current velocity restriction
+    private double velocityMax = VELOCITY_MAX;
+    
+    //the current velocity restriction
+    private double velocityMin = VELOCITY_MIN;
     
     //list of balls in play
     private List<Ball> balls;
@@ -63,7 +65,17 @@ public class Balls extends Entity implements IBalls
     }
     
     //our game reference object
-    private final Game game;
+    protected final Game game;
+    
+    /**
+     * The maximum number of balls allowed
+     */
+    public static final int BALL_MAX = 20;
+    
+    /**
+     * The minimum number of balls allowed
+     */
+    public static final int BALL_MIN = 1;
     
     public Balls(final Game game)
     {
@@ -74,7 +86,7 @@ public class Balls extends Entity implements IBalls
         this.balls = new ArrayList<Ball>();
         
         //set default dimension
-        setDimension(BALL_DIMENSION_MEDIUM);
+        setDimension(BALL_DIMENSION);
         
         //set ball collision true
         setCollision(true);
@@ -100,6 +112,51 @@ public class Balls extends Entity implements IBalls
                 index++;
             }
         }
+        
+        //reset
+        reset(BALL_MIN);
+    }
+    
+    /**
+     * Assign the maximum velocity of the balls
+     * @param velocityMax The desired speed
+     */
+    public void setVelocityMax(final double velocityMax)
+    {
+        this.velocityMax = velocityMax;
+        
+        if (getVelocityMax() < VELOCITY_MAX)
+            setVelocityMax(VELOCITY_MAX);
+    }
+    
+    /**
+     * Assign the minimum velocity of the balls
+     * @param velocityMin The desired speed
+     */
+    public void setVelocityMin(final double velocityMin)
+    {
+        this.velocityMin = velocityMin;
+        
+        if (getVelocityMin() < VELOCITY_MIN)
+            setVelocityMin(VELOCITY_MIN);
+    }
+    
+    /**
+     * Get velocity minimum
+     * @return The minimum amount of pixels the balls are allowed to move
+     */
+    private double getVelocityMin()
+    {
+        return this.velocityMin;
+    }
+    
+    /**
+     * Get velocity maximum
+     * @return The maximum amount of pixels the balls are allowed to move
+     */
+    private double getVelocityMax()
+    {
+        return this.velocityMax;
     }
     
     /**
@@ -141,10 +198,15 @@ public class Balls extends Entity implements IBalls
     /**
      * Reset the balls in the container.<br>
      * The balls will be placed randomly with a random velocity
-     * @param count The number of balls
+     * @param count The number of balls to be created
      */
-    public void reset(final int count)
+    public final void reset(int count)
     {
+        if (count > BALL_MAX)
+            count = BALL_MAX;
+        if (count < BALL_MIN)
+            count = BALL_MIN;
+        
         //create new list
         List<Type> options = new ArrayList<Type>();
         
@@ -171,30 +233,36 @@ public class Balls extends Entity implements IBalls
             ball.setHeight(getDimension());
             
             //pick random location
-            ball.setX(GamePanel.RANDOM.nextInt(GamePanel.WIDTH - getDimension()) + getDimension());
-            ball.setY(GamePanel.RANDOM.nextInt(GamePanel.HEIGHT - getDimension()) + getDimension());
+            ball.setX(GamePanel.RANDOM.nextInt(Boundaries.DEFAULT_BOUNDS.right - Boundaries.DEFAULT_BOUNDS.left - getDimension()) + Boundaries.DEFAULT_BOUNDS.left + getDimension());
+            ball.setY(GamePanel.RANDOM.nextInt(Boundaries.DEFAULT_BOUNDS.bottom - Boundaries.DEFAULT_BOUNDS.top - getDimension()) + Boundaries.DEFAULT_BOUNDS.top + getDimension());
             
             //if we want to apply collision
             if (hasCollision())
             {
                 //continue until this ball does not collide with another
-                while (getBall(ball) != null)
+                while (BallsHelper.getCollisionBall(ball, getBalls()) != null)
                 {
                     //pick random location
-                    ball.setX(GamePanel.RANDOM.nextInt(GamePanel.WIDTH));
-                    ball.setY(GamePanel.RANDOM.nextInt(GamePanel.HEIGHT));
+                    ball.setX(GamePanel.RANDOM.nextInt(Boundaries.DEFAULT_BOUNDS.right - Boundaries.DEFAULT_BOUNDS.left - getDimension()) + Boundaries.DEFAULT_BOUNDS.left + getDimension());
+                    ball.setY(GamePanel.RANDOM.nextInt(Boundaries.DEFAULT_BOUNDS.bottom - Boundaries.DEFAULT_BOUNDS.top - getDimension()) + Boundaries.DEFAULT_BOUNDS.top + getDimension());
                 }
             }
             
             //pick random velocity
-            ball.setDX((GamePanel.RANDOM.nextDouble() * (MAX_VELOCITY - MIN_VELOCITY)) + MIN_VELOCITY);
-            ball.setDY((GamePanel.RANDOM.nextDouble() * (MAX_VELOCITY - MIN_VELOCITY)) + MIN_VELOCITY);
+            ball.setDX((GamePanel.RANDOM.nextDouble() * (getVelocityMax() - getVelocityMin())) + getVelocityMin());
+            ball.setDY((GamePanel.RANDOM.nextDouble() * (getVelocityMax() - getVelocityMin())) + getVelocityMin());
             
-            //if we have at least 2 options remove the selected
-            if (options.size() > 1)
+            //remove option from our list
+            options.remove(index);
+            
+            //if our list is empty, fill list again
+            if (options.isEmpty())
             {
-                //remove option from our list
-                options.remove(index);
+                //add all types to the list
+                for (Type type : Type.values())
+                {
+                    options.add(type);
+                }
             }
             
             //add ball to list
@@ -217,117 +285,15 @@ public class Balls extends Entity implements IBalls
                 
                 //is the collision check option enabled
                 if (hasCollision())
-                {
-                    //check collision with another ball
-                    Ball tmp = getBall(ball);
+                    BallsHelper.checkBallCollision(ball, getBalls());
 
-                    //if ball exists, there was collision
-                    if (tmp != null)
-                    {
-                        //store velocity
-                        final double dx1 = ball.getDX();
-                        final double dy1 = ball.getDY();
-                        final double dx2 = tmp.getDX();
-                        final double dy2 = tmp.getDY();
-                        
-                        //switch velocity
-                        ball.setDX(dx2);
-                        ball.setDY(dy2);
-                        tmp.setDX(dx1);
-                        tmp.setDY(dy1);
-                        
-                        //move the balls
-                        ball.update();
-                        tmp.update();
-                    }
-                }
-                
-                //calculate half the dimension
-                final double h = ball.getHeight() / 2;
-                final double w = ball.getWidth() / 2;
-
-                //get the assigned boundary
-                Boundary boundary = game.getBoundaries().getBoundary(ball.getIndex());
-
-                //manage x-velocity
-                if (ball.getDX() < 0)
-                {
-                    if (ball.getX() < boundary.getRect().left + w)
-                    {
-                        //flip velocity
-                        ball.setDX(-ball.getDX());
-
-                        //adjust coordinates
-                        ball.setX(boundary.getRect().left + w);
-                    }
-                }
-                else if (ball.getDX() > 0)
-                {
-                    if (ball.getX() > boundary.getRect().right - w)
-                    {
-                        //flip velocity
-                        ball.setDX(-ball.getDX());
-
-                        //adjust coordinates
-                        ball.setX(boundary.getRect().right - w);
-                    }
-                }
-
-                //manage y-velocity
-                if (ball.getDY() < 0)
-                {
-                    if (ball.getY() < boundary.getRect().top + h)
-                    {
-                        //flip velocity
-                        ball.setDY(-ball.getDY());
-
-                        //adjust coordinates
-                        ball.setY(boundary.getRect().top + h);
-                    }
-                }
-                else if (ball.getDY() > 0)
-                {
-                    if (ball.getY() > boundary.getRect().bottom - h)
-                    {
-                        //flip velocity
-                        ball.setDY(-ball.getDY());
-
-                        //adjust coordinates
-                        ball.setY(boundary.getRect().bottom - h);
-                    }
-                }
+                //manage the ball velocity with its assigned boundary
+                BallsHelper.checkBallVelocity(ball, game.getBoundaries().getBoundary(ball.getIndex()));
 
                 //update the current ball
                 ball.update();
             }
         }
-    }
-    
-    /**
-     * Get the ball that is in collision.<br>
-     * The ball won't have collision with another ball if they are assigned a different boundary index
-     * @param ball The ball we want to check if it has collision
-     * @return The ball in collision, if none found null is returned
-     */
-    private Ball getBall(final Ball ball)
-    {
-        for (Ball tmp : getBalls())
-        {
-            //don't check self
-            if (ball.hasId(tmp))
-                continue;
-            
-            //don't check balls in a different boundary
-            if (ball.getIndex() != tmp.getIndex())
-                continue;
-            
-            //if the ball is close enough, we have collision
-            if (ball.getDistance(tmp) < ball.getWidth())
-                return tmp;
-        }
-        
-        //none in collision, return null
-        return null;
     }
     
     /**

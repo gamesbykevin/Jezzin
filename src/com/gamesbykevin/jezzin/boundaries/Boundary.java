@@ -1,6 +1,7 @@
 package com.gamesbykevin.jezzin.boundaries;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
@@ -20,6 +21,15 @@ public final class Boundary implements IBoundary
     {
         //store coordinates
         this.bounds = new Rect(x, y, x + w, y + h);
+    }
+    
+    /**
+     * Get the area
+     * @return The total pixels in this boundary
+     */
+    public int getArea()
+    {
+        return (getRect().right - getRect().left) * (getRect().bottom - getRect().top);
     }
     
     /**
@@ -66,10 +76,14 @@ public final class Boundary implements IBoundary
         //only render the square if not solid
         if (!isSolid())
         {
-            //set the style to fill
+            //fill the background
+            paint.setColor(Color.BLACK);
             paint.setStyle(Paint.Style.FILL);
+            canvas.drawRect(getRect(), paint);
             
-            //draw the boundary
+            //render the outline
+            paint.setColor(Color.WHITE);
+            paint.setStyle(Paint.Style.STROKE);
             canvas.drawRect(getRect(), paint);
         }
     }

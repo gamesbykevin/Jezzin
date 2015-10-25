@@ -108,7 +108,7 @@ public class ExitScreen implements Screen, Disposable
                 screen.setState(MainScreen.State.Running);
                 
                 //play sound effect
-                //Audio.play(Assets.AudioKey.Selection);
+                Audio.play(Assets.AudioMenuKey.Selection);
                 
                 //return true;
                 return false;
@@ -119,7 +119,7 @@ public class ExitScreen implements Screen, Disposable
                 screen.setState(MainScreen.State.Ready);
                 
                 //play sound effect
-                //Audio.play(Assets.AudioKey.Selection);
+                Audio.play(Assets.AudioMenuKey.Selection);
                 
                 //return false;
                 return false;

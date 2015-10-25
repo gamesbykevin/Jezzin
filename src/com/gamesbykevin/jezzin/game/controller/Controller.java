@@ -9,6 +9,7 @@ import com.gamesbykevin.androidframework.resources.Audio;
 import com.gamesbykevin.androidframework.resources.Images;
 
 import com.gamesbykevin.jezzin.assets.Assets;
+import com.gamesbykevin.jezzin.boundaries.Boundaries;
 import com.gamesbykevin.jezzin.game.Game;
 import com.gamesbykevin.jezzin.panel.GamePanel;
 import com.gamesbykevin.jezzin.screen.MainScreen;
@@ -33,15 +34,19 @@ public class Controller implements IController
     /**
      * The dimensions of the buttons, to be rendered to the user
      */
-    private final static int BUTTON_DIMENSION = 32;
+    private final static int BUTTON_DIMENSION = 48;
 
-    //location of exit button
-    private final static int EXIT_X = GamePanel.WIDTH - (BUTTON_DIMENSION * 4);
-    private final static int EXIT_Y = 16;
-    
     //location of pause button
-    private final static int PAUSE_X = GamePanel.WIDTH - (BUTTON_DIMENSION * 2);
-    private final static int PAUSE_Y = EXIT_Y;
+    private final static int PAUSE_X = Boundaries.DEFAULT_BOUNDS.right - BUTTON_DIMENSION;
+    private final static int PAUSE_Y = (BUTTON_DIMENSION / 4);
+    
+    //location of sound button
+    private final static int SOUND_X = PAUSE_X - (int)(BUTTON_DIMENSION * 1.5);
+    private final static int SOUND_Y = PAUSE_Y;
+    
+    //location of exit button
+    private final static int EXIT_X = SOUND_X - (int)(BUTTON_DIMENSION * 1.5);
+    private final static int EXIT_Y = PAUSE_Y;
     
     /**
      * Default Constructor
@@ -58,6 +63,8 @@ public class Controller implements IController
         //add button unique key to list
         tmp.add(Assets.ImageGameKey.Pause);
         tmp.add(Assets.ImageGameKey.Exit);
+        tmp.add(Assets.ImageGameKey.SoundOn);
+        tmp.add(Assets.ImageGameKey.SoundOff);
         
         //create new list of buttons
         this.buttons = new HashMap<Assets.ImageGameKey, Button>();
@@ -73,6 +80,10 @@ public class Controller implements IController
         this.buttons.get(Assets.ImageGameKey.Pause).setY(PAUSE_Y);
         this.buttons.get(Assets.ImageGameKey.Exit).setX(EXIT_X);
         this.buttons.get(Assets.ImageGameKey.Exit).setY(EXIT_Y);
+        this.buttons.get(Assets.ImageGameKey.SoundOn).setX(SOUND_X);
+        this.buttons.get(Assets.ImageGameKey.SoundOn).setY(SOUND_Y);
+        this.buttons.get(Assets.ImageGameKey.SoundOff).setX(SOUND_X);
+        this.buttons.get(Assets.ImageGameKey.SoundOff).setY(SOUND_Y);
         
         for (Assets.ImageGameKey key : tmp)
         {
@@ -124,6 +135,18 @@ public class Controller implements IController
                 //event was applied
                 return true;
             }
+            else if (buttons.get(Assets.ImageGameKey.SoundOn).contains(x, y))
+            {
+                //flip setting
+                Audio.setAudioEnabled(!Audio.isAudioEnabled());
+                
+                //determine which button is displayed
+                buttons.get(Assets.ImageGameKey.SoundOn).setVisible(Audio.isAudioEnabled());
+                buttons.get(Assets.ImageGameKey.SoundOff).setVisible(!Audio.isAudioEnabled());
+                
+                //event was applied
+                return true;
+            }
         }
         
         //no event was applied
@@ -163,11 +186,10 @@ public class Controller implements IController
         //draw the buttons
         if (buttons != null)
         {
-            for (Button button : buttons.values())
-            {
-                if (button != null)
-                    button.render(canvas);
-            }
+            //render the buttons
+            this.buttons.get(Assets.ImageGameKey.Pause).render(canvas);
+            this.buttons.get(Assets.ImageGameKey.Exit).render(canvas);
+            this.buttons.get(Audio.isAudioEnabled() ? Assets.ImageGameKey.SoundOn : Assets.ImageGameKey.SoundOff).render(canvas);
         }
     }
 }

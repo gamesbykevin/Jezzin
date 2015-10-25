@@ -136,7 +136,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback, Di
             if (RANDOM == null)
                 RANDOM = new Random(System.nanoTime());
             
-            //load game resources
+            //load game resources (if not loaded already)
             Assets.load(getActivity());
             
             //make sure the screen is created first before the thread starts

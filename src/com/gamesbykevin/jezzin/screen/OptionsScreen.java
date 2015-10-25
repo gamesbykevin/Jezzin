@@ -12,7 +12,9 @@ import com.gamesbykevin.androidframework.resources.Disposable;
 import com.gamesbykevin.androidframework.resources.Images;
 import com.gamesbykevin.androidframework.screen.Screen;
 import com.gamesbykevin.jezzin.assets.Assets;
+import com.gamesbykevin.jezzin.balls.Balls;
 import com.gamesbykevin.jezzin.game.Game;
+import com.gamesbykevin.jezzin.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,14 +34,17 @@ public class OptionsScreen implements Screen, Disposable
     //list of buttons for ball collision
     private List<Button> collisions;
     
-    //list of buttons for ball size
-    private List<Button> sizes;
+    //list of buttons for the difficulties
+    private List<Button> difficulties;
+    
+    //list of levels to start at
+    private List<Button> levels;
+    
+    //list of game modes
+    private List<Button> modes;
     
     //is collision enabled
     private boolean collision = false;
-    
-    //our size selection
-    private int size = 0;
     
     //the go back button
     private Button back;
@@ -49,6 +54,15 @@ public class OptionsScreen implements Screen, Disposable
     
     //paint object to draw text
     private Paint paint;
+    
+    //difficulty selection
+    private int difficultyIndex = 0;
+    
+    //level selection
+    private int levelIndex = 0;
+    
+    //mode selection
+    private int modeIndex = 0;
     
     public OptionsScreen(final MainScreen screen)
     {
@@ -70,10 +84,148 @@ public class OptionsScreen implements Screen, Disposable
         //start coordinates
         int y = MainScreen.BUTTON_Y;
         
+        y += MainScreen.BUTTON_Y_INCREMENT;
+        addButtonsSound(y);
+        
+        y += MainScreen.BUTTON_Y_INCREMENT;
+        addButtonsMode(y);
+        
+        y += MainScreen.BUTTON_Y_INCREMENT;
+        addButtonsDifficulty(y);
+        
+        y += MainScreen.BUTTON_Y_INCREMENT;
+        addButtonsLevels(y);
+        
+        y += MainScreen.BUTTON_Y_INCREMENT;
+        addButtonsCollision(y);
+        
+        y += MainScreen.BUTTON_Y_INCREMENT;
+        addButtonsBack(y);
+    }
+    
+    private void addButtonsMode(int y)
+    {
+        //add collision option
+        this.modes = new ArrayList<Button>();
+        
+        Button button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
+        button.setText("Mode: " + Player.MODE_DESC_CASUAL);
+        button.setX(MainScreen.BUTTON_X);
+        button.setY(y);
+        button.updateBounds();
+        button.positionText(paint);
+        this.modes.add(button);
+        
+        button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
+        button.setText("Mode: " + Player.MODE_DESC_SURVIVAL);
+        button.setX(MainScreen.BUTTON_X);
+        button.setY(y);
+        button.updateBounds();
+        button.positionText(paint);
+        this.modes.add(button);
+        
+        button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
+        button.setText("Mode: " + Player.MODE_DESC_TIMED);
+        button.setX(MainScreen.BUTTON_X);
+        button.setY(y);
+        button.updateBounds();
+        button.positionText(paint);
+        this.modes.add(button);
+        
+        button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
+        button.setText("Mode: " + Player.MODE_DESC_CHALLENGE);
+        button.setX(MainScreen.BUTTON_X);
+        button.setY(y);
+        button.updateBounds();
+        button.positionText(paint);
+        this.modes.add(button);
+    }
+    
+    private void addButtonsLevels(int y)
+    {
+        //add level option
+        this.levels = new ArrayList<Button>();
+        
+        for (int i = 1; i <= Balls.BALL_MAX; i++)
+        {
+            Button button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
+            button.setText("Level: " + i);
+            button.setX(MainScreen.BUTTON_X);
+            button.setY(y);
+            button.updateBounds();
+            button.positionText(paint);
+            this.levels.add(button);
+        }
+    }
+    
+    private void addButtonsBack(int y)
+    {
+        //the back button
+        this.back = new Button(Images.getImage(Assets.ImageMenuKey.Button));
+        this.back.setText("Go Back");
+        this.back.setX(MainScreen.BUTTON_X);
+        this.back.setY(y);
+        this.back.updateBounds();
+        this.back.positionText(paint);
+    }
+    
+    private void addButtonsDifficulty(int y)
+    {
+        //the difficulty options
+        this.difficulties = new ArrayList<Button>();
+        
+        Button button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
+        button.setText("Difficulty: " + Player.DIFFICULTY_DESC_NORMAL);
+        button.setX(MainScreen.BUTTON_X);
+        button.setY(y);
+        button.updateBounds();
+        button.positionText(paint);
+        this.difficulties.add(button);
+        
+        button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
+        button.setText("Difficulty: " + Player.DIFFICULTY_DESC_HARD);
+        button.setX(MainScreen.BUTTON_X);
+        button.setY(y);
+        button.updateBounds();
+        button.positionText(paint);
+        this.difficulties.add(button);
+        
+        button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
+        button.setText("Difficulty: " + Player.DIFFICULTY_DESC_EASY);
+        button.setX(MainScreen.BUTTON_X);
+        button.setY(y);
+        button.updateBounds();
+        button.positionText(paint);
+        this.difficulties.add(button);
+    }
+    
+    private void addButtonsCollision(int y)
+    {
+        //add collision option
+        this.collisions = new ArrayList<Button>();
+        
+        Button button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
+        button.setText("Ball Collision: Disabled");
+        button.setX(MainScreen.BUTTON_X);
+        button.setY(y);
+        button.updateBounds();
+        button.positionText(paint);
+        this.collisions.add(button);
+        
+        button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
+        button.setText("Ball Collision: Enabled");
+        button.setX(MainScreen.BUTTON_X);
+        button.setY(y);
+        button.updateBounds();
+        button.positionText(paint);
+        this.collisions.add(button);
+    }
+    
+    private void addButtonsSound(int y)
+    {
         //add audio option
         this.sounds = new ArrayList<Button>();
         
-        y += MainScreen.BUTTON_Y_INCREMENT;
         Button button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
         button.setText("Sound: Disabled");
         button.setX(MainScreen.BUTTON_X);
@@ -89,80 +241,6 @@ public class OptionsScreen implements Screen, Disposable
         button.updateBounds();
         button.positionText(paint);
         this.sounds.add(button);
-        
-        //add collision option
-        this.collisions = new ArrayList<Button>();
-        
-        y += MainScreen.BUTTON_Y_INCREMENT;
-        button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        button.setText("Ball Collision: Disabled");
-        button.setX(MainScreen.BUTTON_X);
-        button.setY(y);
-        button.updateBounds();
-        button.positionText(paint);
-        this.collisions.add(button);
-        
-        button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        button.setText("Ball Collision: Enabled");
-        button.setX(MainScreen.BUTTON_X);
-        button.setY(y);
-        button.updateBounds();
-        button.positionText(paint);
-        this.collisions.add(button);
-        
-        //add collision option
-        this.sizes = new ArrayList<Button>();
-        
-        y += MainScreen.BUTTON_Y_INCREMENT;
-        button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        button.setText("Size: Medium");
-        button.setX(MainScreen.BUTTON_X);
-        button.setY(y);
-        button.updateBounds();
-        button.positionText(paint);
-        this.sizes.add(button);
-        
-        button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        button.setText("Size: Large");
-        button.setX(MainScreen.BUTTON_X);
-        button.setY(y);
-        button.updateBounds();
-        button.positionText(paint);
-        this.sizes.add(button);
-        
-        button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        button.setText("Size: X-Large");
-        button.setX(MainScreen.BUTTON_X);
-        button.setY(y);
-        button.updateBounds();
-        button.positionText(paint);
-        this.sizes.add(button);
-        
-        button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        button.setText("Size: Very Small");
-        button.setX(MainScreen.BUTTON_X);
-        button.setY(y);
-        button.updateBounds();
-        button.positionText(paint);
-        this.sizes.add(button);
-        
-        button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        button.setText("Size: Small");
-        button.setX(MainScreen.BUTTON_X);
-        button.setY(y);
-        button.updateBounds();
-        button.positionText(paint);
-        this.sizes.add(button);
-        
-        
-        y += MainScreen.BUTTON_Y_INCREMENT;
-        //the back button
-        this.back = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        this.back.setText("Go Back");
-        this.back.setX(MainScreen.BUTTON_X);
-        this.back.setY(y);
-        this.back.updateBounds();
-        this.back.positionText(paint);
     }
     
     /**
@@ -185,12 +263,48 @@ public class OptionsScreen implements Screen, Disposable
                 screen.setState(MainScreen.State.Ready);
                 
                 //play sound effect
-                //Audio.play(Assets.AudioKey.Selection);
+                Audio.play(Assets.AudioMenuKey.Selection);
                 
                 //no need to continue
                 return false;
             }
             
+            for (Button button : modes)
+            {
+                if (button.contains(x, y))
+                {
+                    //increase mode selection
+                    modeIndex++;
+                    
+                    if (modeIndex >= modes.size())
+                        modeIndex = 0;
+                    
+                    //play sound effect
+                    Audio.play(Assets.AudioMenuKey.Selection);
+                    
+                    //exit loop
+                    return false;
+                }
+            }
+            
+            for (Button button : levels)
+            {
+                if (button.contains(x, y))
+                {
+                    //increase level
+                    levelIndex++;
+                    
+                    if (levelIndex >= levels.size())
+                        levelIndex = 0;
+                    
+                    //play sound effect
+                    Audio.play(Assets.AudioMenuKey.Selection);
+                    
+                    //exit loop
+                    return false;
+                }
+            }
+
             for (Button button : sounds)
             {
                 if (button.contains(x, y))
@@ -199,7 +313,26 @@ public class OptionsScreen implements Screen, Disposable
                     Audio.setAudioEnabled(!Audio.isAudioEnabled());
                     
                     //play sound effect
-                    //Audio.play(Assets.AudioKey.Selection);
+                    Audio.play(Assets.AudioMenuKey.Selection);
+                    
+                    //exit loop
+                    return false;
+                }
+            }
+            
+            for (Button button : difficulties)
+            {
+                if (button.contains(x, y))
+                {
+                    //move to the next seletion
+                    this.difficultyIndex++;
+                    
+                    //play sound effect
+                    Audio.play(Assets.AudioMenuKey.Selection);
+                    
+                    //make sure index is within bounds
+                    if (difficultyIndex >= difficulties.size())
+                        difficultyIndex = 0;
                     
                     //exit loop
                     return false;
@@ -214,25 +347,7 @@ public class OptionsScreen implements Screen, Disposable
                     collision = !collision;
                     
                     //play sound effect
-                    //Audio.play(Assets.AudioKey.Selection);
-                    
-                    //exit loop
-                    return false;
-                }
-            }
-            
-            for (Button button : sizes)
-            {
-                if (button.contains(x, y))
-                {
-                    //change setting
-                    size++;
-                    
-                    if (size >= sizes.size())
-                        size = 0;
-                    
-                    //play sound effect
-                    //Audio.play(Assets.AudioKey.Selection);
+                    Audio.play(Assets.AudioMenuKey.Selection);
                     
                     //exit loop
                     return false;
@@ -245,21 +360,39 @@ public class OptionsScreen implements Screen, Disposable
     }
     
     /**
+     * Get the mode index
+     * @return The user selection for mode
+     */
+    public int getModeIndex()
+    {
+        return this.modeIndex;
+    }
+    
+    /**
+     * Get the level index
+     * @return The user selection for level
+     */
+    public int getLevelIndex()
+    {
+        return this.levelIndex;
+    }
+    
+    /**
+     * Get the difficulty index
+     * @return The user selection for difficulty
+     */
+    public int getDifficultyIndex()
+    {
+        return this.difficultyIndex;
+    }
+    
+    /**
      * Is ball collision enabled
      * @return true = yes, false = no
      */
     public boolean hasCollision()
     {
         return this.collision;
-    }
-    
-    /**
-     * Get the ball size
-     * @return The ball size index
-     */
-    public int getBallSize()
-    {
-        return this.size;
     }
     
     @Override
@@ -277,7 +410,9 @@ public class OptionsScreen implements Screen, Disposable
         //draw the menu buttons
         sounds.get(Audio.isAudioEnabled() ? 1 : 0).render(canvas, paint);
         collisions.get(collision ? 1 : 0).render(canvas, paint);
-        sizes.get(getBallSize()).render(canvas, paint);
+        difficulties.get(getDifficultyIndex()).render(canvas, paint);
+        levels.get(getLevelIndex()).render(canvas, paint);
+        modes.get(getModeIndex()).render(canvas, paint);
         
         //render back button
         back.render(canvas, paint);
@@ -290,6 +425,36 @@ public class OptionsScreen implements Screen, Disposable
         {
             back.dispose();
             back = null;
+        }
+        
+        if (levels != null)
+        {
+            for (Button button : levels)
+            {
+                if (button != null)
+                {
+                    button.dispose();
+                    button = null;
+                }
+            }
+            
+            levels.clear();
+            levels = null;
+        }
+        
+        if (difficulties != null)
+        {
+            for (Button button : difficulties)
+            {
+                if (button != null)
+                {
+                    button.dispose();
+                    button = null;
+                }
+            }
+            
+            difficulties.clear();
+            difficulties = null;
         }
         
         if (collisions != null)
@@ -305,21 +470,6 @@ public class OptionsScreen implements Screen, Disposable
             
             collisions.clear();
             collisions = null;
-        }
-        
-        if (sizes != null)
-        {
-            for (Button button : sizes)
-            {
-                if (button != null)
-                {
-                    button.dispose();
-                    button = null;
-                }
-            }
-            
-            sizes.clear();
-            sizes = null;
         }
         
         if (sounds != null)

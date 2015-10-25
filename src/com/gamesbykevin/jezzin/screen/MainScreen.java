@@ -36,7 +36,7 @@ public final class MainScreen implements Screen, Disposable
     }
     
     //the current state of the game
-    private State state;
+    private State state = State.Ready;
     
     //our game panel
     private final GamePanel panel;
@@ -75,7 +75,7 @@ public final class MainScreen implements Screen, Disposable
     /**
      * The alpha visibility to apply when darkening the background
      */
-    private static final int ALPHA_DARK = 175;
+    public static final int ALPHA_DARK = 125;
     
     /**
      * Create our main screen
@@ -98,9 +98,6 @@ public final class MainScreen implements Screen, Disposable
         //store our game panel reference
         this.panel = panel;
         
-        //default to the ready state
-        setState(State.Ready);
-        
         //create new hashmap
         this.screens = new HashMap<State, Screen>();
         this.screens.put(State.Ready, new MenuScreen(this));
@@ -109,6 +106,9 @@ public final class MainScreen implements Screen, Disposable
         this.screens.put(State.Options, new OptionsScreen(this));
         this.screens.put(State.GameOver, new GameoverScreen(this));
         this.screens.put(State.Running, new GameScreen(this));
+        
+        //default to the ready state
+        setState(State.Ready);
     }
     
     @Override
@@ -194,39 +194,42 @@ public final class MainScreen implements Screen, Disposable
      */
     public void setState(final State state)
     {
+        //make sure screen game exists
+        if (getScreenGame() != null)
+        {
+            //if the game and player exist, stop the timer
+            if (getScreenGame().getGame() != null && getScreenGame().getGame().getPlayer() != null)
+                getScreenGame().getGame().getPlayer().stopTimer();
+        }
+        
         //if pausing store the previous state
         if (state == State.Paused)
         {
             //set the previous state
             getScreenPaused().setStatePrevious(getState());
-            
-            //if the player exists, stop the timer when paused
-            //if (getScreenGame().getGame() != null && getScreenGame().getGame().getPlayer() != null)
-            //    getScreenGame().getGame().getPlayer().stopTimer();
-        }
-        else if (state == State.GameOver && getState() != State.Paused)
-        {
-            //reset screen
-            getScreen(state).reset();
-        }
-        
-        //if we are not in running, but we will now be
-        if (getState() != State.Running && state == State.Running)
-        {
-            //stop all sound
-            Audio.stop();
-            
-            //play song
-            //Audio.play(Assets.AudioKey.Music, true);
         }
         else if (state == State.GameOver)
         {
-            //Audio.stop(Assets.AudioKey.Music);
+            if (getState() != State.Paused)
+            {
+                //reset screen
+                getScreen(state).reset();
+            }
         }
-        else
+        
+        
+        //if we are not running
+        if (getState() != State.Running)
         {
-            //stop all sound
-            Audio.stop();
+            //if we are now running
+            if (state == State.Running)
+            {
+                //stop all sound
+                Audio.stop();
+
+                //play song
+                //Audio.play(Assets.AudioKey.Music, true);
+            }
         }
         
         //assign the state

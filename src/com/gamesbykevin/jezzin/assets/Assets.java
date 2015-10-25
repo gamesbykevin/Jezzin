@@ -28,7 +28,12 @@ public class Assets
     /**
      * The directory where image resources are kept for the game
      */
-    private static final String DIRECTORY_GAME_IMAGE = "image/game";
+    private static final String DIRECTORY_GAME_IMAGE_MAIN = "image/game/other";
+    
+    /**
+     * The directory where image resources are kept for the backgrounds in the game
+     */
+    public static final String DIRECTORY_GAME_IMAGE_BACKGROUNDS = "image/game/backgrounds";
     
     /**
      * The directory where font resources are kept
@@ -60,7 +65,7 @@ public class Assets
      */
     public enum FontGameKey
     {
-        
+        Default
     }
     
     /**
@@ -85,7 +90,9 @@ public class Assets
         Balls,
         Exit,
         Pause,
-        Player
+        Player,
+        SoundOff,
+        SoundOn
     }
     
     /**
@@ -94,11 +101,27 @@ public class Assets
      */
     public enum ImageGameBackgroundKey
     {
-        Image1, Image2, Image3, Image4, Image5, Image6, Image7, Image8, Image9, Image10,
+        Image1, Image2;/*, Image3, Image4, Image5, Image6, Image7, Image8, Image9, Image10,
         Image11, Image12, Image13, Image14, Image15, Image16, Image17, Image18, Image19, Image20,
         Image21, Image22, Image23, Image24, Image25, Image26, Image27, Image28, Image29, Image30,
         Image31, Image32, Image33, Image34, Image35, Image36, Image37, Image38, Image39, Image40,
         Image41, Image42, Image43, Image44, Image45, Image46, Image47, Image48, Image49, Image50,
+        Image51, Image52, Image53, Image54, Image55, Image56, Image57, Image58, Image59, Image60,
+        Image61, Image62, Image63, Image64, Image65, Image66, Image67, Image68, Image69, Image70,
+        Image71, Image72, Image73, Image74, Image75;
+        */
+        private final String filename;
+        
+        private ImageGameBackgroundKey()
+        {
+            //store the filename
+            this.filename = this.toString() + ".jpg";
+        }
+        
+        public String getFilename()
+        {
+            return this.filename;
+        }
     }
     
     /**
@@ -116,7 +139,7 @@ public class Assets
      */
     public enum AudioMenuKey
     {
-        
+        Selection
     }
     
     /**
@@ -125,7 +148,19 @@ public class Assets
      */
     public enum AudioGameKey
     {
-        
+        LoseLife, 
+    }
+    
+    /**
+     * Load the specified background image.<br>
+     * Since there are many background images, we only load 1 at a time
+     * @param activity Object containing AssetManager needed to load assets
+     * @param key Unique key to access this image asset
+     * @throws Exception 
+     */
+    public static final void loadBackgroundImage(final Activity activity, final ImageGameBackgroundKey key) throws Exception
+    {
+        Images.loadImage(activity, key, DIRECTORY_GAME_IMAGE_BACKGROUNDS);
     }
     
     /**
@@ -145,46 +180,17 @@ public class Assets
         //load all audio for the menu
         Audio.load(activity, AudioMenuKey.values(), DIRECTORY_MENU_AUDIO, true);
         
-        //load all images for the menu
-        Images.load(activity, ImageGameKey.values(), DIRECTORY_GAME_IMAGE, true);
+        //load images for the game
+        Images.load(activity, ImageGameKey.values(), DIRECTORY_GAME_IMAGE_MAIN, true);
         
         //load all audio for the game
         Audio.load(activity, AudioGameKey.values(), DIRECTORY_GAME_AUDIO, true);
         
+        //load all fonts for the game
+        Font.load(activity, FontGameKey.values(), DIRECTORY_GAME_FONT, true);
+        
         //load all text files
         Files.load(activity, TextKey.values(), DIRECTORY_TEXT, true);
-    }
-    
-    /**
-     * Get the total assets count used by the menu screens.<br>
-     * This information is used for the progress bar.
-     * @return The total number of assets that we need for the menu
-     */
-    public static final int getMenuAssetsCount()
-    {
-        return FontMenuKey.values().length + AudioMenuKey.values().length + ImageMenuKey.values().length;
-    }
-    
-    /**
-     * Load the menu assets.<br>
-     * The assets will be loaded one at a time when this method is called.<br>
-     * Then we will return the total number of assets loaded
-     * @param activity Object containing the asset manager required to load the asset
-     * @return The total number of assets loaded so far
-     * @throws Exception 
-     */
-    public static final int loadMenuAssets(final Activity activity) throws Exception
-    {
-        //track the total number of assets loaded
-        int count = 0;
-        
-        //load the assets
-        count += Images.load(activity, ImageMenuKey.values(), DIRECTORY_MENU_IMAGE, false);
-        count += Audio.load(activity, AudioMenuKey.values(), DIRECTORY_MENU_AUDIO, false);
-        count += Font.load(activity, FontMenuKey.values(), DIRECTORY_MENU_FONT, false);
-        
-        //return the total number loaded
-        return count;
     }
     
     /**

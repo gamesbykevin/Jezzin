@@ -66,8 +66,6 @@ public class MenuScreen implements Screen, Disposable
         Start, Exit, Settings, Instructions, More, Rate
     }
     
-    private boolean reset = false;
-    
     public MenuScreen(final MainScreen screen)
     {
         //store reference to the logo
@@ -145,16 +143,21 @@ public class MenuScreen implements Screen, Disposable
     @Override
     public boolean update(final MotionEvent event, final float x, final float y) throws Exception
     {
-        //if reset don't continue
-        if (reset)
-            return false;
-        
         if (event.getAction() == MotionEvent.ACTION_UP)
         {
             if (buttons.get(Key.Start).contains(x, y))
             {
-                //flag reset true
-                reset = true;
+                //load game assets
+                Assets.load(screen.getPanel().getActivity());
+
+                //create the game
+                screen.getScreenGame().createGame();
+
+                //set running state
+                screen.setState(MainScreen.State.Running);
+
+                //play sound effect
+                Audio.play(Assets.AudioMenuKey.Selection);
 
                 //we do not request any additional events
                 return false;
@@ -165,7 +168,7 @@ public class MenuScreen implements Screen, Disposable
                 screen.setState(MainScreen.State.Options);
                 
                 //play sound effect
-                //Audio.play(Assets.AudioKey.Selection);
+                Audio.play(Assets.AudioMenuKey.Selection);
                 
                 //we do not request any additional events
                 return false;
@@ -173,7 +176,7 @@ public class MenuScreen implements Screen, Disposable
             else if (buttons.get(Key.Instructions).contains(x, y))
             {
                 //play sound effect
-                //Audio.play(Assets.AudioKey.Selection);
+                Audio.play(Assets.AudioMenuKey.Selection);
                 
                 //go to instructions
                 this.screen.getPanel().getActivity().openWebpage(MainActivity.WEBPAGE_GAME_INSTRUCTIONS_URL);
@@ -184,7 +187,7 @@ public class MenuScreen implements Screen, Disposable
             else if (buttons.get(Key.Rate).contains(x, y))
             {
                 //play sound effect
-                //Audio.play(Assets.AudioKey.Selection);
+                Audio.play(Assets.AudioMenuKey.Selection);
                 
                 //go to web page
                 this.screen.getPanel().getActivity().openWebpage(MainActivity.WEBPAGE_RATE_URL);
@@ -195,7 +198,7 @@ public class MenuScreen implements Screen, Disposable
             else if (buttons.get(Key.More).contains(x, y))
             {
                 //play sound effect
-                //Audio.play(Assets.AudioKey.Selection);
+                Audio.play(Assets.AudioMenuKey.Selection);
                 
                 //go to web page
                 this.screen.getPanel().getActivity().openWebpage(MainActivity.WEBPAGE_MORE_GAMES_URL);
@@ -206,7 +209,7 @@ public class MenuScreen implements Screen, Disposable
             else if (buttons.get(Key.Exit).contains(x, y))
             {
                 //play sound effect
-                //Audio.play(Assets.AudioKey.Selection);
+                Audio.play(Assets.AudioMenuKey.Selection);
                 
                 //exit game
                 this.screen.getPanel().getActivity().finish();
@@ -223,19 +226,7 @@ public class MenuScreen implements Screen, Disposable
     @Override
     public void update() throws Exception
     {
-        if (reset)
-        {
-            //create the game
-            screen.getScreenGame().createGame();
-
-            //set running state
-            screen.setState(MainScreen.State.Running);
-
-            //play sound effect
-            //Audio.play(Assets.AudioKey.Selection);
-
-            reset = false;
-        }
+        //no need to do anything here
     }
     
     @Override

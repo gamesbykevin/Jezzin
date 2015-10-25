@@ -6,14 +6,20 @@ import android.graphics.Paint;
 import android.view.MotionEvent;
 
 import com.gamesbykevin.androidframework.base.Cell;
-import com.gamesbykevin.androidframework.io.storage.Internal;
+import com.gamesbykevin.androidframework.resources.Font;
+import com.gamesbykevin.androidframework.resources.Images;
+import com.gamesbykevin.androidframework.text.TimeFormat;
 
 import com.gamesbykevin.jezzin.assets.Assets;
+import com.gamesbykevin.jezzin.background.Background;
 import com.gamesbykevin.jezzin.balls.Balls;
 import com.gamesbykevin.jezzin.boundaries.Boundaries;
 import com.gamesbykevin.jezzin.game.controller.Controller;
 import com.gamesbykevin.jezzin.player.Player;
+import com.gamesbykevin.jezzin.scorecard.Score;
+import com.gamesbykevin.jezzin.scorecard.ScoreCard;
 import com.gamesbykevin.jezzin.screen.MainScreen;
+import com.gamesbykevin.jezzin.screen.MainScreen.State;
 
 /**
  * The main game logic will happen here
@@ -28,7 +34,7 @@ public final class Game implements IGame
     private Paint paint;
     
     //our storage object used to save data
-    private Internal storage;
+    private ScoreCard scorecard;
     
     //our controller objet
     private Controller controller;
@@ -42,15 +48,8 @@ public final class Game implements IGame
     //the player in the game
     private Player player;
     
-    /**
-     * Text delimeter used to parse internal storage data for each level
-     */
-    private static final String STORAGE_DELIMITER_LEVEL = ",";
-    
-    /**
-     * Text delimeter used to parse internal storage data for each attribute in a level
-     */
-    private static final String STORAGE_DELIMITER_ATTRIBUTE = ";";
+    //our game background
+    private Background background;
     
     public Game(final MainScreen screen) throws Exception
     {
@@ -59,8 +58,10 @@ public final class Game implements IGame
         
         //create new paint object
         this.paint = new Paint();
-        this.paint.setTextSize(24f);
+        this.paint.setTypeface(Font.getFont(Assets.FontGameKey.Default));
+        this.paint.setTextSize(16f);
         this.paint.setColor(Color.WHITE);
+        this.paint.setLinearText(false);
         
         //create ball container
         this.balls = new Balls(this);
@@ -73,13 +74,27 @@ public final class Game implements IGame
         
         //create the boundaries container
         this.boundaries = new Boundaries(this);
+        
+        //create our background object
+        this.background = new Background(this);
+        
+        //create score card to track best score
+        this.scorecard = new ScoreCard(this, screen.getPanel().getActivity());
     }
     
+    /**
+     * Get the player
+     * @return The current player object
+     */
     public Player getPlayer()
     {
         return this.player;
     }
     
+    /**
+     * Get the boundaries
+     * @return The object containing the boundaries in a level
+     */
     public Boundaries getBoundaries()
     {
         return this.boundaries;
@@ -104,6 +119,15 @@ public final class Game implements IGame
     }
     
     /**
+     * Get the background object
+     * @return Object that manages the background
+     */
+    public Background getBackground()
+    {
+        return this.background;
+    }
+    
+    /**
      * Get the main screen object reference
      * @return The main screen object reference
      */
@@ -112,76 +136,71 @@ public final class Game implements IGame
         return this.screen;
     }
     
-    /**
-     * Restart game with assigned settings
-     * @throws Exception 
-     */
     @Override
-    public void reset() throws Exception
+    public void reset(final int level) throws Exception
     {
-        //create our storage object
-        //this.storage = new Internal("TEST", screen.getPanel().getActivity());
-        
         //assign collision setting
         getBalls().setCollision(getMainScreen().getScreenOptions().hasCollision());        
         
-        //assign ball size
-        switch (getMainScreen().getScreenOptions().getBallSize())
-        {
-            case 0:
-                getBalls().setDimension(Balls.BALL_DIMENSION_MEDIUM);
-                break;
-            
-            case 1:
-                getBalls().setDimension(Balls.BALL_DIMENSION_LARGE);
-                break;
-            
-            case 2:
-                getBalls().setDimension(Balls.BALL_DIMENSION_XLARGE);
-                break;
-            
-            case 3:
-                getBalls().setDimension(Balls.BALL_DIMENSION_XSMALL);
-                break;
-            
-            case 4:
-                getBalls().setDimension(Balls.BALL_DIMENSION_SMALL);
-                break;
-            
-            default:
-                throw new Exception("Size not accounted here: " + getMainScreen().getScreenOptions().getBallSize());
-        }
-        
-        //reset the ball container with the specified number of balls
-        getBalls().reset(5);
+        //reset the balls
+        getBalls().reset(level);
         
         //reset player
         getPlayer().reset();
         
+        //the number of balls will be the amount of lives + 1
+        getPlayer().setLives(level + 1);
+        
+        //assign the level
+        getPlayer().setLevel(level);
+        
+        //setup game depending on mode
+        switch (getMainScreen().getScreenOptions().getModeIndex())
+        {
+            case Player.MODE_INDEX_CASUAL:
+            case Player.MODE_INDEX_SURVIVIAL:
+            default:
+                break;
+                
+            case Player.MODE_INDEX_CHALLENGE:
+                break;
+                
+            case Player.MODE_INDEX_TIMED:
+                break;
+        }
+        
         //reset boundaries
         getBoundaries().reset();
-    }
-    
-    /**
-     * Update the internal storage.<br>
-     * We will update the content of the storage with the current list of completed levels
-     */
-    public void updateStorage()
-    {
-        //remove all contents
-        //getStorage().getContent().delete(0, getStorage().getContent().length());
         
-        //save data to storage
-        //getStorage().save();
+        //reset background
+        getBackground().reset();
+        
+        //make sure our score card object exists
+        if (getScoreCard() != null)
+        {
+            //get the score reference for the current level and difficulty
+            Score score = getScoreCard().getScore(
+                getMainScreen().getScreenOptions().getModeIndex(), 
+                getMainScreen().getScreenOptions().getDifficultyIndex(), 
+                level
+            );
+            
+            //make sure the score object exists
+            if (score != null)
+            {
+                //assign the best score for this level
+                getPlayer().setBestDesc(TimeFormat.getDescription(Player.TIME_FORMAT, score.getTime()));
+            }
+        }
     }
     
     /**
-     * Get storage
-     * @return Our internal storage object reference
+     * Get our score card
+     * @return Our score card to track the user personal best score
      */
-    private Internal getStorage()
+    public ScoreCard getScoreCard()
     {
-        return this.storage;
+        return this.scorecard;
     }
     
     /**
@@ -203,10 +222,6 @@ public final class Game implements IGame
                     getPlayer().updateMotionEvent(event, x, y);
             }
         }
-        else
-        {
-            
-        }
     }
     
     /**
@@ -223,21 +238,15 @@ public final class Game implements IGame
         
         if (getBalls() != null)
             getBalls().update();
-        
-        
-        /*
-        //save information to internal storage
-        updateStorage();
-
-        //set game over state
-        screen.setState(MainScreen.State.GameOver);
-
-        //set display message
-        screen.getScreenGameover().setMessage("Level Complete");
-
-        //no need to continue
-        return;
-        */
+    }
+    
+    /**
+     * Get the paint object
+     * @return The paint object used to draw text in the game
+     */
+    public Paint getPaint()
+    {
+        return this.paint;
     }
     
     @Override
@@ -267,8 +276,19 @@ public final class Game implements IGame
             balls = null;
         }
         
+        if (background != null)
+        {
+            background.dispose();
+            background = null;
+        }
+        
         paint = null;
-        storage = null;
+        
+        if (scorecard != null)
+        {
+            scorecard.dispose();
+            scorecard = null;
+        }
     }
     
     /**
@@ -278,19 +298,32 @@ public final class Game implements IGame
      */
     public void render(final Canvas canvas) throws Exception
     {
-        //fill in black background
-        canvas.drawColor(Color.WHITE);
+        //fill background with black
+        canvas.drawColor(Color.BLACK);
         
-        if (getBoundaries() != null)
-            getBoundaries().render(canvas);
+        if (getBackground() != null)
+            getBackground().render(canvas);
         
-        if (getController() != null)
-            getController().render(canvas);
-        
-        if (getBalls() != null)
-            getBalls().render(canvas);
+        if (getBoundaries() != null && getBalls() != null)
+        {
+            //continue to show the boundaries and balls until goal is met
+            if (getBoundaries().getTotalProgress() < Player.PROGRESS_GOAL)
+            {
+                getBoundaries().render(canvas);
+                getBalls().render(canvas);
+            }
+        }
         
         if (getPlayer() != null)
             getPlayer().render(canvas);
+        
+        //render the controller for specific states
+        if (screen.getState() != MainScreen.State.GameOver && 
+            screen.getState() != MainScreen.State.Ready && 
+            screen.getState() != MainScreen.State.Options)
+        {
+            if (getController() != null)
+                getController().render(canvas);
+        }
     }
 }

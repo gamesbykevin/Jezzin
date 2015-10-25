@@ -22,7 +22,7 @@ public class MainActivity extends Activity
     /**
      * The web address where this game can be rated
      */
-    public static final String WEBPAGE_RATE_URL = "https://play.google.com/store/apps/details?id=com.gamesbykevin.trapballs";
+    public static final String WEBPAGE_RATE_URL = "https://play.google.com/store/apps/details?id=com.gamesbykevin.jezzin";
 
     /**
      * The url that contains the instructions for the game
@@ -36,24 +36,12 @@ public class MainActivity extends Activity
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        //if splash screen exists we want to finish it since it is no longer needed
-        if (SplashScreen.SPLASH_SCREEN != null)
-        {
-            //if the progress dialog is showing, hide it
-            if (SplashScreen.SPLASH_SCREEN.getProgressDialog().isShowing())
-                SplashScreen.SPLASH_SCREEN.getProgressDialog().dismiss();
-            
-            //finish the activity as well, since it is not needed
-            SplashScreen.SPLASH_SCREEN.finish();
-            SplashScreen.SPLASH_SCREEN = null;
-        }
-        
         //turn the title off
         super.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         //set the screen to full screen
         super.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
+        
         //call parent create
         super.onCreate(savedInstanceState);
         
