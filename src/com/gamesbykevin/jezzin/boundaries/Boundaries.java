@@ -7,6 +7,7 @@ import android.graphics.Rect;
 
 import com.gamesbykevin.androidframework.anim.Animation;
 import com.gamesbykevin.androidframework.base.Entity;
+import com.gamesbykevin.androidframework.resources.Audio;
 import com.gamesbykevin.androidframework.resources.Images;
 import com.gamesbykevin.androidframework.text.TimeFormat;
 
@@ -290,6 +291,9 @@ public final class Boundaries extends Entity implements IBoundaries
         //the index of the current rectangle
         index = 0;
         
+        //stop drawing
+        setDraw(false);
+        
         //reset values
         resetProgress();
     }
@@ -345,9 +349,13 @@ public final class Boundaries extends Entity implements IBoundaries
                         getGame().getPlayer().getTime()
                     );
                     
-                    //if true, then a new record was found
-                    if (result)
-                        getGame().getPlayer().setBestDesc(TimeFormat.getDescription(Player.TIME_FORMAT, getGame().getPlayer().getTime()));
+                    //play sound effect
+                    Audio.play(Assets.AudioGameKey.ProgressComplete);
+                }
+                else
+                {
+                    //play sound effect
+                    Audio.play(Assets.AudioGameKey.ProgressAdd);
                 }
             }
             else
@@ -369,7 +377,17 @@ public final class Boundaries extends Entity implements IBoundaries
                     
                     //if no more lives, the game is over
                     if (getGame().getPlayer().getLives() < 1)
+                    {
                         getGame().getMainScreen().setState(MainScreen.State.GameOver);
+                        
+                        //play sound effect
+                        Audio.play(Assets.AudioGameKey.NoLives);
+                    }
+                    else
+                    {
+                        //play sound effect
+                        Audio.play(Assets.AudioGameKey.LoseLife);
+                    }
                 }
             }
         }

@@ -51,6 +51,14 @@ public final class Game implements IGame
     //our game background
     private Background background;
     
+    /**
+     * The amount of time to set the clock per ball in timed mode
+     */
+    private static final long TIMED_DELAY_PER_BALL = 20000L;
+    
+    //is the game being reset
+    private boolean reset = false;
+    
     public Game(final MainScreen screen) throws Exception
     {
         //our main screen object reference
@@ -139,11 +147,11 @@ public final class Game implements IGame
     @Override
     public void reset(final int level) throws Exception
     {
+        //flag reset
+        reset = true;
+        
         //assign collision setting
         getBalls().setCollision(getMainScreen().getScreenOptions().hasCollision());        
-        
-        //reset the balls
-        getBalls().reset(level);
         
         //reset player
         getPlayer().reset();
@@ -154,32 +162,14 @@ public final class Game implements IGame
         //assign the level
         getPlayer().setLevel(level);
         
-        //setup game depending on mode
-        switch (getMainScreen().getScreenOptions().getModeIndex())
-        {
-            case Player.MODE_INDEX_CASUAL:
-            case Player.MODE_INDEX_SURVIVIAL:
-            default:
-                break;
-                
-            case Player.MODE_INDEX_CHALLENGE:
-                break;
-                
-            case Player.MODE_INDEX_TIMED:
-                break;
-        }
+        //score object for reference
+        Score score = null;
         
-        //reset boundaries
-        getBoundaries().reset();
-        
-        //reset background
-        getBackground().reset();
-        
-        //make sure our score card object exists
+        //make sure our score card object exists, to see if we have a best time to beat
         if (getScoreCard() != null)
         {
             //get the score reference for the current level and difficulty
-            Score score = getScoreCard().getScore(
+            score = getScoreCard().getScore(
                 getMainScreen().getScreenOptions().getModeIndex(), 
                 getMainScreen().getScreenOptions().getDifficultyIndex(), 
                 level
@@ -192,6 +182,51 @@ public final class Game implements IGame
                 getPlayer().setBestDesc(TimeFormat.getDescription(Player.TIME_FORMAT, score.getTime()));
             }
         }
+        
+        //setup game depending on mode
+        switch (getMainScreen().getScreenOptions().getModeIndex())
+        {
+            case Player.MODE_INDEX_CASUAL:
+            default:
+                getPlayer().setCountdown(false);
+                break;
+                
+            case Player.MODE_INDEX_SURVIVIAL:
+                
+                //we won't count down the clock
+                getPlayer().setCountdown(false);
+                
+                //player will only have 1 life
+                getPlayer().setLives(1);
+                break;
+                
+            case Player.MODE_INDEX_CHALLENGE:
+                if (score != null)
+                {
+                    getPlayer().setCountdown(true);
+                    getPlayer().setTime(score.getTime());
+                }
+                else
+                {
+                    //if there is no previous score we will count up
+                    getPlayer().setCountdown(false);
+                }
+                break;
+                
+            case Player.MODE_INDEX_TIMED:
+                getPlayer().setCountdown(true);
+                getPlayer().setTime(level * TIMED_DELAY_PER_BALL);
+                break;
+        }
+        
+        //reset boundaries
+        getBoundaries().reset();
+        
+        //reset background
+        getBackground().reset();
+        
+        //reset the balls
+        getBalls().reset(level);
     }
     
     /**
@@ -230,14 +265,22 @@ public final class Game implements IGame
      */
     public void update() throws Exception
     {
-        if (getBoundaries() != null)
-            getBoundaries().update();
-        
-        if (getPlayer() != null)
-            getPlayer().update();
-        
-        if (getBalls() != null)
-            getBalls().update();
+        //make sure we aren't resetting
+        if (reset)
+        {
+            reset = false;
+        }
+        else
+        {
+            if (getBoundaries() != null)
+                getBoundaries().update();
+
+            if (getPlayer() != null)
+                getPlayer().update();
+
+            if (getBalls() != null)
+                getBalls().update();
+        }
     }
     
     /**
@@ -252,6 +295,12 @@ public final class Game implements IGame
     @Override
     public void dispose()
     {
+        if (scorecard != null)
+        {
+            scorecard.dispose();
+            scorecard = null;
+        }
+        
         if (boundaries != null)
         {
             boundaries.dispose();
@@ -298,32 +347,36 @@ public final class Game implements IGame
      */
     public void render(final Canvas canvas) throws Exception
     {
-        //fill background with black
-        canvas.drawColor(Color.BLACK);
-        
-        if (getBackground() != null)
-            getBackground().render(canvas);
-        
-        if (getBoundaries() != null && getBalls() != null)
+        //make sure we aren't resetting
+        if (!reset)
         {
-            //continue to show the boundaries and balls until goal is met
-            if (getBoundaries().getTotalProgress() < Player.PROGRESS_GOAL)
+            //fill background with black
+            canvas.drawColor(Color.BLACK);
+
+            if (getBackground() != null)
+                getBackground().render(canvas);
+
+            if (getBoundaries() != null && getBalls() != null)
             {
-                getBoundaries().render(canvas);
-                getBalls().render(canvas);
+                //continue to show the boundaries and balls until goal is met
+                if (getBoundaries().getTotalProgress() < Player.PROGRESS_GOAL)
+                {
+                    getBoundaries().render(canvas);
+                    getBalls().render(canvas);
+                }
             }
-        }
-        
-        if (getPlayer() != null)
-            getPlayer().render(canvas);
-        
-        //render the controller for specific states
-        if (screen.getState() != MainScreen.State.GameOver && 
-            screen.getState() != MainScreen.State.Ready && 
-            screen.getState() != MainScreen.State.Options)
-        {
-            if (getController() != null)
-                getController().render(canvas);
+
+            if (getPlayer() != null)
+                getPlayer().render(canvas);
+
+            //render the controller for specific states
+            if (screen.getState() != MainScreen.State.GameOver && 
+                screen.getState() != MainScreen.State.Ready && 
+                screen.getState() != MainScreen.State.Options)
+            {
+                if (getController() != null)
+                    getController().render(canvas);
+            }
         }
     }
 }

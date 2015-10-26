@@ -144,6 +144,10 @@ public class Controller implements IController
                 buttons.get(Assets.ImageGameKey.SoundOn).setVisible(Audio.isAudioEnabled());
                 buttons.get(Assets.ImageGameKey.SoundOff).setVisible(!Audio.isAudioEnabled());
                 
+                //if audio enabled, play music
+                if (Audio.isAudioEnabled())
+                    Audio.play(GamePanel.RANDOM.nextBoolean() ? Assets.AudioGameKey.Music1 : Assets.AudioGameKey.Music2, true);
+                
                 //event was applied
                 return true;
             }

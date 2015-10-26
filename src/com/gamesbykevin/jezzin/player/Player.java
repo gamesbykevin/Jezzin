@@ -5,6 +5,7 @@ import android.graphics.Paint;
 import android.view.MotionEvent;
 
 import com.gamesbykevin.androidframework.anim.Animation;
+import com.gamesbykevin.androidframework.resources.Audio;
 import com.gamesbykevin.androidframework.resources.Images;
 import com.gamesbykevin.androidframework.text.TimeFormat;
 import com.gamesbykevin.jezzin.assets.Assets;
@@ -12,6 +13,7 @@ import com.gamesbykevin.jezzin.balls.Balls;
 import com.gamesbykevin.jezzin.boundaries.Boundaries;
 import com.gamesbykevin.jezzin.game.Game;
 import com.gamesbykevin.jezzin.panel.GamePanel;
+import com.gamesbykevin.jezzin.screen.MainScreen;
 
 /**
  * The player that plays the game
@@ -103,6 +105,9 @@ public final class Player implements IPlayer
      */
     public static final int PROGRESS_GOAL = 75;
     
+    //do we count down the timer
+    private boolean countdown = false;
+    
     public Player(final Game game)
     {
         super();
@@ -115,6 +120,15 @@ public final class Player implements IPlayer
         
         //set default level
         setLevel(1);
+    }
+    
+    /**
+     * Flag the countdown
+     * @param countdown true = we will countdown the timer, false = we will count up
+     */
+    public void setCountdown(final boolean countdown)
+    {
+        this.countdown = countdown;
     }
     
     /**
@@ -189,6 +203,15 @@ public final class Player implements IPlayer
     public long getTime()
     {
         return this.time;
+    }
+    
+    /**
+     * Set the time
+     * @param time The time milliseconds of the timer
+     */
+    public void setTime(final long time)
+    {
+        this.time = time;
     }
     
     /**
@@ -310,8 +333,31 @@ public final class Player implements IPlayer
         //get the current time
         final long current = System.currentTimeMillis();
         
-        //add the difference to the total time
-        this.time += (current - previous);
+        if (countdown)
+        {
+            //subtract the difference to the total time
+            this.time -= (current - previous);
+            
+            if (getTime() < 0)
+            {
+                //set time to 0
+                setTime(0);
+                
+                //change the state to game over
+                game.getMainScreen().setState(MainScreen.State.GameOver);
+                
+                //play sound effect
+                Audio.play(Assets.AudioGameKey.TimeUp);
+                
+                //no need to continue
+                return;
+            }
+        }
+        else
+        {
+            //add the difference to the total time
+            this.time += (current - previous);
+        }
         
         //update the time description
         this.setTimeDesc(TimeFormat.getDescription(TIME_FORMAT, getTime()));

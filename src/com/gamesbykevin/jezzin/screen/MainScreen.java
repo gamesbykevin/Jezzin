@@ -210,6 +210,9 @@ public final class MainScreen implements Screen, Disposable
         }
         else if (state == State.GameOver)
         {
+            //stop sound
+            Audio.stop();
+            
             if (getState() != State.Paused)
             {
                 //reset screen
@@ -227,8 +230,8 @@ public final class MainScreen implements Screen, Disposable
                 //stop all sound
                 Audio.stop();
 
-                //play song
-                //Audio.play(Assets.AudioKey.Music, true);
+                //play random song
+                Audio.play(GamePanel.RANDOM.nextBoolean() ? Assets.AudioGameKey.Music1 : Assets.AudioGameKey.Music2, true);
             }
         }
         

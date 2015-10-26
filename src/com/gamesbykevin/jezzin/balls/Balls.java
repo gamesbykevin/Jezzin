@@ -233,8 +233,8 @@ public final class Balls extends Entity implements IBalls
             ball.setHeight(getDimension());
             
             //pick random location
-            ball.setX(GamePanel.RANDOM.nextInt(Boundaries.DEFAULT_BOUNDS.right - Boundaries.DEFAULT_BOUNDS.left - getDimension()) + Boundaries.DEFAULT_BOUNDS.left + getDimension());
-            ball.setY(GamePanel.RANDOM.nextInt(Boundaries.DEFAULT_BOUNDS.bottom - Boundaries.DEFAULT_BOUNDS.top - getDimension()) + Boundaries.DEFAULT_BOUNDS.top + getDimension());
+            ball.setX(GamePanel.RANDOM.nextInt(Boundaries.DEFAULT_BOUNDS.width() - getDimension()) + Boundaries.DEFAULT_BOUNDS.left);
+            ball.setY(GamePanel.RANDOM.nextInt(Boundaries.DEFAULT_BOUNDS.height() - getDimension()) + Boundaries.DEFAULT_BOUNDS.top);
             
             //if we want to apply collision
             if (hasCollision())
@@ -243,8 +243,8 @@ public final class Balls extends Entity implements IBalls
                 while (BallsHelper.getCollisionBall(ball, getBalls()) != null)
                 {
                     //pick random location
-                    ball.setX(GamePanel.RANDOM.nextInt(Boundaries.DEFAULT_BOUNDS.right - Boundaries.DEFAULT_BOUNDS.left - getDimension()) + Boundaries.DEFAULT_BOUNDS.left + getDimension());
-                    ball.setY(GamePanel.RANDOM.nextInt(Boundaries.DEFAULT_BOUNDS.bottom - Boundaries.DEFAULT_BOUNDS.top - getDimension()) + Boundaries.DEFAULT_BOUNDS.top + getDimension());
+                    ball.setX(GamePanel.RANDOM.nextInt(Boundaries.DEFAULT_BOUNDS.width() - getDimension()) + Boundaries.DEFAULT_BOUNDS.left);
+                    ball.setY(GamePanel.RANDOM.nextInt(Boundaries.DEFAULT_BOUNDS.height() - getDimension()) + Boundaries.DEFAULT_BOUNDS.top);
                 }
             }
             

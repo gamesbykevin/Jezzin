@@ -12,6 +12,7 @@ import com.gamesbykevin.androidframework.resources.Disposable;
 import com.gamesbykevin.androidframework.resources.Images;
 import com.gamesbykevin.androidframework.screen.Screen;
 import com.gamesbykevin.jezzin.MainActivity;
+import com.gamesbykevin.jezzin.R;
 import com.gamesbykevin.jezzin.assets.Assets;
 
 import java.util.HashMap;
@@ -65,6 +66,9 @@ public class MenuScreen implements Screen, Disposable
     {
         Start, Exit, Settings, Instructions, More, Rate
     }
+    
+    //start new game, and did we notify user
+    private boolean reset = false, notify = false;
     
     public MenuScreen(final MainScreen screen)
     {
@@ -143,22 +147,20 @@ public class MenuScreen implements Screen, Disposable
     @Override
     public boolean update(final MotionEvent event, final float x, final float y) throws Exception
     {
+        //if the game is to reset, don't continue
+        if (reset)
+            return false;
+        
         if (event.getAction() == MotionEvent.ACTION_UP)
         {
             if (buttons.get(Key.Start).contains(x, y))
             {
-                //load game assets
-                Assets.load(screen.getPanel().getActivity());
+                //flag reset
+                reset = true;
 
-                //create the game
-                screen.getScreenGame().createGame();
-
-                //set running state
-                screen.setState(MainScreen.State.Running);
-
-                //play sound effect
-                Audio.play(Assets.AudioMenuKey.Selection);
-
+                //unflag notify
+                notify = false;
+                
                 //we do not request any additional events
                 return false;
             }
@@ -226,22 +228,48 @@ public class MenuScreen implements Screen, Disposable
     @Override
     public void update() throws Exception
     {
-        //no need to do anything here
+        if (reset && notify)
+        {
+            reset = false;
+            
+            //load game assets
+            Assets.load(screen.getPanel().getActivity());
+
+            //create the game
+            screen.getScreenGame().createGame();
+
+            //set running state
+            screen.setState(MainScreen.State.Running);
+
+            //play sound effect
+            Audio.play(Assets.AudioMenuKey.Selection);
+        }
     }
     
     @Override
     public void render(final Canvas canvas) throws Exception
     {
-        //draw main logo
-        canvas.drawBitmap(logo, MainScreen.LOGO_X, MainScreen.LOGO_Y, null);
-        
-        //draw the menu buttons
-        if (buttons != null)
+        if (reset)
         {
-            for (Button button : buttons.values())
+            //render splash scren
+            canvas.drawBitmap(Images.getImage(Assets.ImageMenuKey.Splash), 0, 0, null);
+            
+            //we notified the user
+            notify = true;
+        }
+        else
+        {
+            //draw main logo
+            canvas.drawBitmap(logo, MainScreen.LOGO_X, MainScreen.LOGO_Y, null);
+
+            //draw the menu buttons
+            if (buttons != null)
             {
-                if (button != null)
-                    button.render(canvas, screen.getPaint());
+                for (Button button : buttons.values())
+                {
+                    if (button != null)
+                        button.render(canvas, screen.getPaint());
+                }
             }
         }
     }

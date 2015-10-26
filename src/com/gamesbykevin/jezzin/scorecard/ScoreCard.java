@@ -192,10 +192,10 @@ public final class ScoreCard extends Internal
             //write difficulty, level, time
             super.getContent().append(score.getModeIndex());
             super.getContent().append(SEPARATOR);
-            super.getContent().append(score.getDifficultyIndex()); 
-            super.getContent().append(SEPARATOR); 
-            super.getContent().append(score.getLevel()); 
-            super.getContent().append(SEPARATOR); 
+            super.getContent().append(score.getDifficultyIndex());
+            super.getContent().append(SEPARATOR);
+            super.getContent().append(score.getLevel());
+            super.getContent().append(SEPARATOR);
             super.getContent().append(score.getTime());
         }
         

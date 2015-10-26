@@ -1,13 +1,17 @@
 package com.gamesbykevin.jezzin.panel;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
 import com.gamesbykevin.androidframework.resources.Audio;
 import com.gamesbykevin.androidframework.resources.Disposable;
 
 import com.gamesbykevin.jezzin.MainActivity;
+import com.gamesbykevin.jezzin.R;
 import com.gamesbykevin.jezzin.assets.Assets;
 import com.gamesbykevin.jezzin.screen.MainScreen;
 import com.gamesbykevin.jezzin.thread.MainThread;
@@ -38,6 +42,12 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback, Di
     //our main game thread
     private MainThread thread;
     
+    //splash loading screen
+    private Bitmap splash;
+    
+    //did we notify the user of loading
+    private boolean notify = false;
+    
     /**
      * Create a new game panel
      * @param activity Our main activity reference
@@ -53,15 +63,8 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback, Di
         //make game panel focusable = true so it can handle events
         super.setFocusable(true);
         
-        try
-        {
-            //load game resources
-            Assets.load(getActivity());
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        //load splash image to be displayed to the user
+        splash = BitmapFactory.decodeResource(activity.getResources(), R.drawable.splash);
     }
     
     @Override
@@ -110,6 +113,9 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback, Di
             screen = null;
         }
         
+        if (splash != null)
+            splash = null;
+        
         //recycle asset objects
         Assets.recycle();
     }
@@ -125,24 +131,23 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback, Di
     
     /**
      * Now that the surface has been created we can create our game objects
-     * @param holder 
+     * @param holder Object used to track events
      */
     @Override
     public void surfaceCreated(SurfaceHolder holder)
     {
         try
         {
+            //flag assets as not loaded
+            Assets.LOADED = false;
+            
+            //flag we did not notify
+            notify = false;
+            
             //create if null
             if (RANDOM == null)
                 RANDOM = new Random(System.nanoTime());
             
-            //load game resources (if not loaded already)
-            Assets.load(getActivity());
-            
-            //make sure the screen is created first before the thread starts
-            if (this.screen == null)
-                this.screen = new MainScreen(this);
-
             //if the thread does not exist, create it
             if (this.thread == null)
                 this.thread = new MainThread(getHolder(), this);
@@ -192,6 +197,12 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback, Di
     @Override
     public void surfaceDestroyed(SurfaceHolder holder)
     {
+        //flag assets as not loaded
+        Assets.LOADED = false;
+        
+        //flag we did not notify
+        notify = false;
+        
         //pause the game
         if (screen != null)
         {
@@ -216,8 +227,29 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback, Di
     {
         try
         {
-            if (screen != null)
-                screen.update();
+            if (notify)
+            {
+                //make sure the screen is created first before the thread starts
+                if (this.screen == null)
+                {
+                    if (!Assets.LOADED)
+                    {
+                        //load all assets
+                        Assets.load(getActivity());
+
+                        //flag assets loaded
+                        Assets.LOADED = true;
+                    }
+                    else
+                    {
+                        this.screen = new MainScreen(this);
+                    }
+                }
+                else
+                {
+                    screen.update();
+                }
+            }
         }
         catch (Exception e)
         {
@@ -235,16 +267,25 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback, Di
             
             try
             {
+                final float scaleFactorX = getWidth() / (float)GamePanel.WIDTH;
+                final float scaleFactorY = getHeight() / (float)GamePanel.HEIGHT;
+
+                //scale to the screen size
+                canvas.scale(scaleFactorX, scaleFactorY);
+                
+                //render splash image
+                if (splash != null)
+                {
+                    //render image
+                    canvas.drawBitmap(splash, 0, 0, null);
+                    
+                    //flag notify
+                    notify = true;
+                }
+                
                 //make sure the screen object exists
                 if (screen != null)
                 {
-                    //calculate the screen ratio
-                    final float scaleFactorX = getWidth() / (float)GamePanel.WIDTH;
-                    final float scaleFactorY = getHeight() / (float)GamePanel.HEIGHT;
-
-                    //scale to the screen size
-                    canvas.scale(scaleFactorX, scaleFactorY);
-            
                     //render the main sreen containing the game and other screens
                     screen.render(canvas);
                 }
