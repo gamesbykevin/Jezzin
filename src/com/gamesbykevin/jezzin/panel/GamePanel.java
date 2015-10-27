@@ -3,6 +3,7 @@ package com.gamesbykevin.jezzin.panel;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -13,7 +14,7 @@ import com.gamesbykevin.androidframework.resources.Disposable;
 import com.gamesbykevin.jezzin.MainActivity;
 import com.gamesbykevin.jezzin.R;
 import com.gamesbykevin.jezzin.assets.Assets;
-import com.gamesbykevin.jezzin.screen.MainScreen;
+import com.gamesbykevin.jezzin.screen.ScreenManager;
 import com.gamesbykevin.jezzin.thread.MainThread;
 
 import java.util.Random;
@@ -37,7 +38,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback, Di
     private final MainActivity activity;
     
     //the object containing our game screens
-    private MainScreen screen;
+    private ScreenManager screen;
     
     //our main game thread
     private MainThread thread;
@@ -47,6 +48,9 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback, Di
     
     //did we notify the user of loading
     private boolean notify = false;
+    
+    //the source and destination used to render the splash image
+    private Rect source, destination;
     
     /**
      * Create a new game panel
@@ -210,7 +214,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback, Di
             Audio.stop();
             
             //set the state
-            screen.setState(MainScreen.State.Paused);
+            screen.setState(ScreenManager.State.Paused);
         }
     }
     
@@ -242,7 +246,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback, Di
                     }
                     else
                     {
-                        this.screen = new MainScreen(this);
+                        this.screen = new ScreenManager(this);
                     }
                 }
                 else
@@ -276,9 +280,17 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback, Di
                 //render splash image
                 if (splash != null)
                 {
-                    //render image
-                    canvas.drawBitmap(splash, 0, 0, null);
-                    
+                    if (screen == null)
+                    {
+                        if (source == null)
+                            source = new Rect(0, 0, GamePanel.WIDTH, GamePanel.HEIGHT);
+                        if (destination == null)
+                            destination = new Rect(0, 0, getWidth(), getHeight());
+                        
+                        //render image
+                        canvas.drawBitmap(splash, source, destination, null);
+                    }
+
                     //flag notify
                     notify = true;
                 }

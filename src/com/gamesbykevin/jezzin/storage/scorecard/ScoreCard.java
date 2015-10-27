@@ -1,4 +1,4 @@
-package com.gamesbykevin.jezzin.scorecard;
+package com.gamesbykevin.jezzin.storage.scorecard;
 
 import android.app.Activity;
 
@@ -6,6 +6,7 @@ import com.gamesbykevin.androidframework.io.storage.Internal;
 
 import com.gamesbykevin.jezzin.game.Game;
 import com.gamesbykevin.jezzin.player.Player;
+import com.gamesbykevin.jezzin.thread.MainThread;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,14 +21,14 @@ public final class ScoreCard extends Internal
     private List<Score> scores;
     
     /**
-     * New line string
+     * New level separator string
      */
-    private static final String NEW_LINE = "\\n";
+    private static final String NEW_LEVEL = ";";
     
     /**
      * This string will separate the level from the time
      */
-    private static final String SEPARATOR = ";";
+    private static final String SEPARATOR = "-";
     
     //our game reference object
     private final Game game;
@@ -46,13 +47,13 @@ public final class ScoreCard extends Internal
         if (super.getContent().toString().trim().length() > 0)
         {
             //load file with each level on a new line
-            final String[] levels = super.getContent().toString().split(NEW_LINE);
+            final String[] levels = super.getContent().toString().split(NEW_LEVEL);
 
             //load each level into our array
             for (int index = 0; index < levels.length; index++)
             {
                 //split level data
-                String[] data = levels[index].replace(NEW_LINE, "").replaceAll(NEW_LINE, "").split(SEPARATOR);
+                String[] data = levels[index].split(SEPARATOR);
 
                 //get the information
                 final int modeIndex = Integer.parseInt(data[0]);
@@ -105,7 +106,7 @@ public final class ScoreCard extends Internal
             scores.add(new Score(modeIndex, difficultyIndex, level, time));
 
             //save to internal storage
-            save();
+            this.save();
 
             //score was updated
             return true;
@@ -127,7 +128,7 @@ public final class ScoreCard extends Internal
                         score.setTime(time);
                         
                         //save data
-                        save();
+                        this.save();
                         
                         //score was updated
                         return true;
@@ -148,7 +149,7 @@ public final class ScoreCard extends Internal
                         score.setTime(time);
                         
                         //save data
-                        save();
+                        this.save();
                         
                         //score was updated
                         return true;
@@ -166,7 +167,7 @@ public final class ScoreCard extends Internal
                     score.setTime(score.getTime() - time);
                     
                     //save data
-                    save();
+                    this.save();
 
                     //score was updated
                     return true;
@@ -187,7 +188,7 @@ public final class ScoreCard extends Internal
         {
             //if content exists, add new line, to separate each level
             if (super.getContent().length() > 0)
-                super.getContent().append(NEW_LINE);
+                super.getContent().append(NEW_LEVEL);
             
             //write difficulty, level, time
             super.getContent().append(score.getModeIndex());

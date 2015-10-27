@@ -15,8 +15,8 @@ import com.gamesbykevin.jezzin.assets.Assets;
 import com.gamesbykevin.jezzin.game.Game;
 import com.gamesbykevin.jezzin.panel.GamePanel;
 import com.gamesbykevin.jezzin.player.Player;
-import com.gamesbykevin.jezzin.scorecard.Score;
-import com.gamesbykevin.jezzin.screen.MainScreen;
+import com.gamesbykevin.jezzin.storage.scorecard.Score;
+import com.gamesbykevin.jezzin.screen.ScreenManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -138,16 +138,12 @@ public final class Boundaries extends Entity implements IBoundaries
                     finishI = i;
             }
             
-            //if the start and finish are not in the same boundary, return false
-            if (startI != finishI)
+            //if the start index was not found, return false
+            if (startI < 0)
                 return false;
             
-            //if the index was not found, return false
-            if (startI < 0 || finishI < 0)
-                return false;
-            
-            //if either is solid, return false
-            if (getBoundary(startI).isSolid() || getBoundary(finishI).isSolid())
+            //if the start is solid, return false
+            if (getBoundary(startI).isSolid())
                 return false;
             
             //store the current index
@@ -339,15 +335,26 @@ public final class Boundaries extends Entity implements IBoundaries
                 if (getTotalProgress() >= Player.PROGRESS_GOAL)
                 {
                     //set the state
-                    getGame().getMainScreen().setState(MainScreen.State.GameOver);
+                    getGame().getMainScreen().setState(ScreenManager.State.GameOver);
                     
-                    //update the score and record the result
+                    //update the score
                     final boolean result = getGame().getScoreCard().updateScore(
                         getGame().getMainScreen().getScreenOptions().getModeIndex(), 
                         getGame().getMainScreen().getScreenOptions().getDifficultyIndex(), 
                         getGame().getPlayer().getLevel(), 
                         getGame().getPlayer().getTime()
                     );
+                    
+                    if (result)
+                    {
+                        //assign message to display to user
+                        getGame().getMainScreen().getScreenGameover().setMessage("New record");
+                    }
+                    else
+                    {
+                        //assign message to display to user
+                        getGame().getMainScreen().getScreenGameover().setMessage("You win");
+                    }
                     
                     //play sound effect
                     Audio.play(Assets.AudioGameKey.ProgressComplete);
@@ -378,7 +385,10 @@ public final class Boundaries extends Entity implements IBoundaries
                     //if no more lives, the game is over
                     if (getGame().getPlayer().getLives() < 1)
                     {
-                        getGame().getMainScreen().setState(MainScreen.State.GameOver);
+                        getGame().getMainScreen().setState(ScreenManager.State.GameOver);
+                        
+                        //assign message to display to user
+                        getGame().getMainScreen().getScreenGameover().setMessage("No More Lives");
                         
                         //play sound effect
                         Audio.play(Assets.AudioGameKey.NoLives);

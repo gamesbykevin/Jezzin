@@ -61,7 +61,7 @@ public final class Balls extends Entity implements IBalls
         Ball1, Ball2, Ball3, Ball4, Ball5, Ball6, 
         Ball7, Ball8, Ball9, Ball10, Ball11, Ball12, 
         Ball13, Ball14, Ball15, Ball16, Ball17, Ball18, 
-        Ball19, Ball20, Ball21, Ball22, Ball23, Ball24, 
+        Ball19, Ball20;// Ball21, Ball22, Ball23, Ball24, 
     }
     
     //our game reference object
@@ -100,6 +100,16 @@ public final class Balls extends Entity implements IBalls
         {
             for (int row = 0; row < 4; row++)
             {
+                //skip dark colored balls because they are difficult to see
+                if (col == 2 && row == 0)
+                    continue;
+                if (col == 1 && row == 1)
+                    continue;
+                if (col == 1 && row == 3)
+                    continue;
+                if (col == 3 && row == 3)
+                    continue;
+                
                 final int x = col * d;
                 final int y = row * d;
                 
@@ -109,6 +119,7 @@ public final class Balls extends Entity implements IBalls
                 //add to spritesheet
                 super.getSpritesheet().add(Type.values()[index], animation);
                 
+                //increase index
                 index++;
             }
         }

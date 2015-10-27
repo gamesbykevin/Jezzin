@@ -12,7 +12,7 @@ import com.gamesbykevin.jezzin.assets.Assets;
 import com.gamesbykevin.jezzin.boundaries.Boundaries;
 import com.gamesbykevin.jezzin.game.Game;
 import com.gamesbykevin.jezzin.panel.GamePanel;
-import com.gamesbykevin.jezzin.screen.MainScreen;
+import com.gamesbykevin.jezzin.screen.ScreenManager;
 
 import java.util.HashMap;
 
@@ -122,7 +122,7 @@ public class Controller implements IController
             if (buttons.get(Assets.ImageGameKey.Pause).contains(x, y))
             {
                 //change the state to paused
-                getGame().getMainScreen().setState(MainScreen.State.Paused);
+                getGame().getMainScreen().setState(ScreenManager.State.Paused);
                 
                 //event was applied
                 return true;
@@ -130,7 +130,7 @@ public class Controller implements IController
             else if (buttons.get(Assets.ImageGameKey.Exit).contains(x, y))
             {
                 //change to the exit confirm screen
-                getGame().getMainScreen().setState(MainScreen.State.Exit);
+                getGame().getMainScreen().setState(ScreenManager.State.Exit);
                 
                 //event was applied
                 return true;

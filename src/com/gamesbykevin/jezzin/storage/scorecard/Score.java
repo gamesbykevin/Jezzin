@@ -1,4 +1,4 @@
-package com.gamesbykevin.jezzin.scorecard;
+package com.gamesbykevin.jezzin.storage.scorecard;
 
 /**
  * The score for a level

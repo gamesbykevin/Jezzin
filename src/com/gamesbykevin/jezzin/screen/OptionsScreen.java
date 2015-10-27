@@ -13,8 +13,8 @@ import com.gamesbykevin.androidframework.resources.Images;
 import com.gamesbykevin.androidframework.screen.Screen;
 import com.gamesbykevin.jezzin.assets.Assets;
 import com.gamesbykevin.jezzin.balls.Balls;
-import com.gamesbykevin.jezzin.game.Game;
 import com.gamesbykevin.jezzin.player.Player;
+import com.gamesbykevin.jezzin.storage.settings.Settings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +50,7 @@ public class OptionsScreen implements Screen, Disposable
     private Button back;
     
     //our main screen reference
-    private final MainScreen screen;
+    private final ScreenManager screen;
     
     //paint object to draw text
     private Paint paint;
@@ -64,7 +64,10 @@ public class OptionsScreen implements Screen, Disposable
     //mode selection
     private int modeIndex = 0;
     
-    public OptionsScreen(final MainScreen screen)
+    //our storage settings object
+    private Settings settings;
+    
+    public OptionsScreen(final ScreenManager screen)
     {
         //our logo reference
         this.logo = Images.getImage(Assets.ImageMenuKey.Logo);
@@ -82,25 +85,28 @@ public class OptionsScreen implements Screen, Disposable
         this.paint.setColor(Color.WHITE);
         
         //start coordinates
-        int y = MainScreen.BUTTON_Y;
+        int y = ScreenManager.BUTTON_Y;
         
-        y += MainScreen.BUTTON_Y_INCREMENT;
+        y += ScreenManager.BUTTON_Y_INCREMENT;
         addButtonsSound(y);
         
-        y += MainScreen.BUTTON_Y_INCREMENT;
+        y += ScreenManager.BUTTON_Y_INCREMENT;
         addButtonsMode(y);
         
-        y += MainScreen.BUTTON_Y_INCREMENT;
+        y += ScreenManager.BUTTON_Y_INCREMENT;
         addButtonsDifficulty(y);
         
-        y += MainScreen.BUTTON_Y_INCREMENT;
+        y += ScreenManager.BUTTON_Y_INCREMENT;
         addButtonsLevels(y);
         
-        y += MainScreen.BUTTON_Y_INCREMENT;
+        y += ScreenManager.BUTTON_Y_INCREMENT;
         addButtonsCollision(y);
         
-        y += MainScreen.BUTTON_Y_INCREMENT;
+        y += ScreenManager.BUTTON_Y_INCREMENT;
         addButtonsBack(y);
+        
+        //create our settings object, which will load the previous settings
+        this.settings = new Settings(this, screen.getPanel().getActivity());
     }
     
     private void addButtonsMode(int y)
@@ -110,7 +116,7 @@ public class OptionsScreen implements Screen, Disposable
         
         Button button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
         button.setText("Mode: " + Player.MODE_DESC_CASUAL);
-        button.setX(MainScreen.BUTTON_X);
+        button.setX(ScreenManager.BUTTON_X);
         button.setY(y);
         button.updateBounds();
         button.positionText(paint);
@@ -118,7 +124,7 @@ public class OptionsScreen implements Screen, Disposable
         
         button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
         button.setText("Mode: " + Player.MODE_DESC_SURVIVAL);
-        button.setX(MainScreen.BUTTON_X);
+        button.setX(ScreenManager.BUTTON_X);
         button.setY(y);
         button.updateBounds();
         button.positionText(paint);
@@ -126,7 +132,7 @@ public class OptionsScreen implements Screen, Disposable
         
         button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
         button.setText("Mode: " + Player.MODE_DESC_TIMED);
-        button.setX(MainScreen.BUTTON_X);
+        button.setX(ScreenManager.BUTTON_X);
         button.setY(y);
         button.updateBounds();
         button.positionText(paint);
@@ -134,7 +140,7 @@ public class OptionsScreen implements Screen, Disposable
         
         button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
         button.setText("Mode: " + Player.MODE_DESC_CHALLENGE);
-        button.setX(MainScreen.BUTTON_X);
+        button.setX(ScreenManager.BUTTON_X);
         button.setY(y);
         button.updateBounds();
         button.positionText(paint);
@@ -150,7 +156,7 @@ public class OptionsScreen implements Screen, Disposable
         {
             Button button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
             button.setText("Level: " + i);
-            button.setX(MainScreen.BUTTON_X);
+            button.setX(ScreenManager.BUTTON_X);
             button.setY(y);
             button.updateBounds();
             button.positionText(paint);
@@ -163,7 +169,7 @@ public class OptionsScreen implements Screen, Disposable
         //the back button
         this.back = new Button(Images.getImage(Assets.ImageMenuKey.Button));
         this.back.setText("Go Back");
-        this.back.setX(MainScreen.BUTTON_X);
+        this.back.setX(ScreenManager.BUTTON_X);
         this.back.setY(y);
         this.back.updateBounds();
         this.back.positionText(paint);
@@ -176,7 +182,7 @@ public class OptionsScreen implements Screen, Disposable
         
         Button button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
         button.setText("Difficulty: " + Player.DIFFICULTY_DESC_NORMAL);
-        button.setX(MainScreen.BUTTON_X);
+        button.setX(ScreenManager.BUTTON_X);
         button.setY(y);
         button.updateBounds();
         button.positionText(paint);
@@ -184,7 +190,7 @@ public class OptionsScreen implements Screen, Disposable
         
         button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
         button.setText("Difficulty: " + Player.DIFFICULTY_DESC_HARD);
-        button.setX(MainScreen.BUTTON_X);
+        button.setX(ScreenManager.BUTTON_X);
         button.setY(y);
         button.updateBounds();
         button.positionText(paint);
@@ -192,7 +198,7 @@ public class OptionsScreen implements Screen, Disposable
         
         button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
         button.setText("Difficulty: " + Player.DIFFICULTY_DESC_EASY);
-        button.setX(MainScreen.BUTTON_X);
+        button.setX(ScreenManager.BUTTON_X);
         button.setY(y);
         button.updateBounds();
         button.positionText(paint);
@@ -206,7 +212,7 @@ public class OptionsScreen implements Screen, Disposable
         
         Button button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
         button.setText("Ball Collision: Disabled");
-        button.setX(MainScreen.BUTTON_X);
+        button.setX(ScreenManager.BUTTON_X);
         button.setY(y);
         button.updateBounds();
         button.positionText(paint);
@@ -214,7 +220,7 @@ public class OptionsScreen implements Screen, Disposable
         
         button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
         button.setText("Ball Collision: Enabled");
-        button.setX(MainScreen.BUTTON_X);
+        button.setX(ScreenManager.BUTTON_X);
         button.setY(y);
         button.updateBounds();
         button.positionText(paint);
@@ -228,7 +234,7 @@ public class OptionsScreen implements Screen, Disposable
         
         Button button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
         button.setText("Sound: Disabled");
-        button.setX(MainScreen.BUTTON_X);
+        button.setX(ScreenManager.BUTTON_X);
         button.setY(y);
         button.updateBounds();
         button.positionText(paint);
@@ -236,7 +242,7 @@ public class OptionsScreen implements Screen, Disposable
         
         button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
         button.setText("Sound: Enabled");
-        button.setX(MainScreen.BUTTON_X);
+        button.setX(ScreenManager.BUTTON_X);
         button.setY(y);
         button.updateBounds();
         button.positionText(paint);
@@ -259,8 +265,11 @@ public class OptionsScreen implements Screen, Disposable
         {
             if (back.contains(x, y))
             {
+                //store our settings
+                settings.save();
+                
                 //set ready state
-                screen.setState(MainScreen.State.Ready);
+                screen.setState(ScreenManager.State.Ready);
                 
                 //play sound effect
                 Audio.play(Assets.AudioMenuKey.Selection);
@@ -274,10 +283,7 @@ public class OptionsScreen implements Screen, Disposable
                 if (button.contains(x, y))
                 {
                     //increase mode selection
-                    modeIndex++;
-                    
-                    if (modeIndex >= modes.size())
-                        modeIndex = 0;
+                    setModeIndex(getModeIndex() + 1);
                     
                     //play sound effect
                     Audio.play(Assets.AudioMenuKey.Selection);
@@ -292,10 +298,7 @@ public class OptionsScreen implements Screen, Disposable
                 if (button.contains(x, y))
                 {
                     //increase level
-                    levelIndex++;
-                    
-                    if (levelIndex >= levels.size())
-                        levelIndex = 0;
+                    setLevelIndex(getLevelIndex() + 1);
                     
                     //play sound effect
                     Audio.play(Assets.AudioMenuKey.Selection);
@@ -325,14 +328,10 @@ public class OptionsScreen implements Screen, Disposable
                 if (button.contains(x, y))
                 {
                     //move to the next seletion
-                    this.difficultyIndex++;
+                    setDifficultyIndex(getDifficultyIndex() + 1);
                     
                     //play sound effect
                     Audio.play(Assets.AudioMenuKey.Selection);
-                    
-                    //make sure index is within bounds
-                    if (difficultyIndex >= difficulties.size())
-                        difficultyIndex = 0;
                     
                     //exit loop
                     return false;
@@ -344,7 +343,7 @@ public class OptionsScreen implements Screen, Disposable
                 if (button.contains(x, y))
                 {
                     //flip setting
-                    collision = !collision;
+                    setCollision(!hasCollision());
                     
                     //play sound effect
                     Audio.play(Assets.AudioMenuKey.Selection);
@@ -360,12 +359,36 @@ public class OptionsScreen implements Screen, Disposable
     }
     
     /**
+     * Assign the mode index
+     * @param modeIndex The desired mode index
+     */
+    public void setModeIndex(final int modeIndex)
+    {
+        this.modeIndex = modeIndex;
+        
+        if (getModeIndex() >= modes.size())
+            setModeIndex(0);
+    }
+    
+    /**
      * Get the mode index
      * @return The user selection for mode
      */
     public int getModeIndex()
     {
         return this.modeIndex;
+    }
+    
+    /**
+     * Assign the level index
+     * @param levelIndex The desired level index
+     */
+    public void setLevelIndex(final int levelIndex)
+    {
+        this.levelIndex = levelIndex;
+        
+        if (getLevelIndex() >= levels.size())
+            setLevelIndex(0);
     }
     
     /**
@@ -378,12 +401,33 @@ public class OptionsScreen implements Screen, Disposable
     }
     
     /**
+     * Assign the difficulty index
+     * @param difficultyIndex The desired difficulty index
+     */
+    public void setDifficultyIndex(final int difficultyIndex)
+    {
+        this.difficultyIndex = difficultyIndex;
+        
+        if (getDifficultyIndex() >= difficulties.size())
+            setDifficultyIndex(0);
+    }
+    
+    /**
      * Get the difficulty index
      * @return The user selection for difficulty
      */
     public int getDifficultyIndex()
     {
         return this.difficultyIndex;
+    }
+    
+    /**
+     * Assign collision
+     * @param collision true if collision enabled, false otherwise 
+     */
+    public void setCollision(final boolean collision)
+    {
+        this.collision = collision;
     }
     
     /**
@@ -405,11 +449,11 @@ public class OptionsScreen implements Screen, Disposable
     public void render(final Canvas canvas) throws Exception
     {
         //draw main logo
-        canvas.drawBitmap(logo, MainScreen.LOGO_X, MainScreen.LOGO_Y, null);
+        canvas.drawBitmap(logo, ScreenManager.LOGO_X, ScreenManager.LOGO_Y, null);
         
         //draw the menu buttons
         sounds.get(Audio.isAudioEnabled() ? 1 : 0).render(canvas, paint);
-        collisions.get(collision ? 1 : 0).render(canvas, paint);
+        collisions.get(hasCollision() ? 1 : 0).render(canvas, paint);
         difficulties.get(getDifficultyIndex()).render(canvas, paint);
         levels.get(getLevelIndex()).render(canvas, paint);
         modes.get(getModeIndex()).render(canvas, paint);
@@ -425,6 +469,12 @@ public class OptionsScreen implements Screen, Disposable
         {
             back.dispose();
             back = null;
+        }
+        
+        if (settings != null)
+        {
+            settings.dispose();
+            settings = null;
         }
         
         if (levels != null)

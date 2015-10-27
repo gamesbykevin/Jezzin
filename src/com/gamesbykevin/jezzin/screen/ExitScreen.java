@@ -31,7 +31,7 @@ public class ExitScreen implements Screen, Disposable
     private final int pixelW, pixelH;
     
     //our main screen reference
-    private final MainScreen screen;
+    private final ScreenManager screen;
     
     //object to paint background
     private Paint paint;
@@ -44,7 +44,7 @@ public class ExitScreen implements Screen, Disposable
      */
     private static final int BUTTON_DIMENSION = 96;
     
-    public ExitScreen(final MainScreen screen)
+    public ExitScreen(final ScreenManager screen)
     {
         //store our parent reference
         this.screen = screen;
@@ -105,7 +105,7 @@ public class ExitScreen implements Screen, Disposable
             if (buttons.get(Assets.ImageMenuKey.Cancel).contains(x, y))
             {
                 //if cancel, go back to game
-                screen.setState(MainScreen.State.Running);
+                screen.setState(ScreenManager.State.Running);
                 
                 //play sound effect
                 Audio.play(Assets.AudioMenuKey.Selection);
@@ -116,7 +116,7 @@ public class ExitScreen implements Screen, Disposable
             else if (buttons.get(Assets.ImageMenuKey.Confirm).contains(x, y))
             {
                 //if confirm, go back to menu
-                screen.setState(MainScreen.State.Ready);
+                screen.setState(ScreenManager.State.Ready);
                 
                 //play sound effect
                 Audio.play(Assets.AudioMenuKey.Selection);

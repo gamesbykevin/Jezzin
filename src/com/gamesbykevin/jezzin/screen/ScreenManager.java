@@ -13,7 +13,6 @@ import com.gamesbykevin.androidframework.resources.Images;
 import com.gamesbykevin.androidframework.screen.Screen;
 
 import com.gamesbykevin.jezzin.assets.Assets;
-import com.gamesbykevin.jezzin.game.Game;
 import com.gamesbykevin.jezzin.panel.GamePanel;
 
 import java.util.HashMap;
@@ -22,7 +21,7 @@ import java.util.HashMap;
  * This class will contain the game screens
  * @author ABRAHAM
  */
-public final class MainScreen implements Screen, Disposable
+public final class ScreenManager implements Screen, Disposable
 {
     //the background image
     private Entity background;
@@ -81,7 +80,7 @@ public final class MainScreen implements Screen, Disposable
      * Create our main screen
      * @param panel The reference to our game panel
      */
-    public MainScreen(final GamePanel panel)
+    public ScreenManager(final GamePanel panel)
     {
         //create a new background
         this.background = new Entity();
@@ -205,6 +204,9 @@ public final class MainScreen implements Screen, Disposable
         //if pausing store the previous state
         if (state == State.Paused)
         {
+            //stop sound
+            Audio.stop();
+            
             //set the previous state
             getScreenPaused().setStatePrevious(getState());
         }
@@ -232,6 +234,11 @@ public final class MainScreen implements Screen, Disposable
 
                 //play random song
                 Audio.play(GamePanel.RANDOM.nextBoolean() ? Assets.AudioGameKey.Music1 : Assets.AudioGameKey.Music2, true);
+            }
+            else
+            {
+                //stop sound
+                Audio.stop();
             }
         }
         

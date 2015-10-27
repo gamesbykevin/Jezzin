@@ -16,10 +16,10 @@ import com.gamesbykevin.jezzin.balls.Balls;
 import com.gamesbykevin.jezzin.boundaries.Boundaries;
 import com.gamesbykevin.jezzin.game.controller.Controller;
 import com.gamesbykevin.jezzin.player.Player;
-import com.gamesbykevin.jezzin.scorecard.Score;
-import com.gamesbykevin.jezzin.scorecard.ScoreCard;
-import com.gamesbykevin.jezzin.screen.MainScreen;
-import com.gamesbykevin.jezzin.screen.MainScreen.State;
+import com.gamesbykevin.jezzin.storage.scorecard.Score;
+import com.gamesbykevin.jezzin.storage.scorecard.ScoreCard;
+import com.gamesbykevin.jezzin.screen.ScreenManager;
+import com.gamesbykevin.jezzin.screen.ScreenManager.State;
 
 /**
  * The main game logic will happen here
@@ -28,7 +28,7 @@ import com.gamesbykevin.jezzin.screen.MainScreen.State;
 public final class Game implements IGame
 {
     //our main screen object reference
-    private final MainScreen screen;
+    private final ScreenManager screen;
     
     //paint object to draw text
     private Paint paint;
@@ -59,7 +59,7 @@ public final class Game implements IGame
     //is the game being reset
     private boolean reset = false;
     
-    public Game(final MainScreen screen) throws Exception
+    public Game(final ScreenManager screen) throws Exception
     {
         //our main screen object reference
         this.screen = screen;
@@ -139,7 +139,7 @@ public final class Game implements IGame
      * Get the main screen object reference
      * @return The main screen object reference
      */
-    public MainScreen getMainScreen()
+    public ScreenManager getMainScreen()
     {
         return this.screen;
     }
@@ -295,12 +295,6 @@ public final class Game implements IGame
     @Override
     public void dispose()
     {
-        if (scorecard != null)
-        {
-            scorecard.dispose();
-            scorecard = null;
-        }
-        
         if (boundaries != null)
         {
             boundaries.dispose();
@@ -370,9 +364,9 @@ public final class Game implements IGame
                 getPlayer().render(canvas);
 
             //render the controller for specific states
-            if (screen.getState() != MainScreen.State.GameOver && 
-                screen.getState() != MainScreen.State.Ready && 
-                screen.getState() != MainScreen.State.Options)
+            if (screen.getState() != ScreenManager.State.GameOver && 
+                screen.getState() != ScreenManager.State.Ready && 
+                screen.getState() != ScreenManager.State.Options)
             {
                 if (getController() != null)
                     getController().render(canvas);

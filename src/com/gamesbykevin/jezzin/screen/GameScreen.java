@@ -19,12 +19,12 @@ public class GameScreen implements Screen, Disposable
     private Game game;
     
     //our main screen reference
-    private final MainScreen screen;
+    private final ScreenManager screen;
     
     //are we loading game assets? (image/audio/font etc...)
     private boolean loading = true;
     
-    public GameScreen(final MainScreen screen)
+    public GameScreen(final ScreenManager screen)
     {
         this.screen = screen;
     }

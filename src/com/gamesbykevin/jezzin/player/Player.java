@@ -4,16 +4,14 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.view.MotionEvent;
 
-import com.gamesbykevin.androidframework.anim.Animation;
 import com.gamesbykevin.androidframework.resources.Audio;
-import com.gamesbykevin.androidframework.resources.Images;
 import com.gamesbykevin.androidframework.text.TimeFormat;
 import com.gamesbykevin.jezzin.assets.Assets;
 import com.gamesbykevin.jezzin.balls.Balls;
 import com.gamesbykevin.jezzin.boundaries.Boundaries;
 import com.gamesbykevin.jezzin.game.Game;
 import com.gamesbykevin.jezzin.panel.GamePanel;
-import com.gamesbykevin.jezzin.screen.MainScreen;
+import com.gamesbykevin.jezzin.screen.ScreenManager;
 
 /**
  * The player that plays the game
@@ -97,7 +95,7 @@ public final class Player implements IPlayer
     private static final int GOAL_Y = TIMER_Y - 10;
     private static final int PROGRESS_X = LIVES_X;
     private static final int PROGRESS_Y = PERSONAL_BEST_Y;
-    private static final int MODE_X = Boundaries.DEFAULT_BOUNDS.left + 137;
+    private static final int MODE_X = Boundaries.DEFAULT_BOUNDS.left + 135;
     private static final int MODE_Y = LEVEL_Y;
     
     /**
@@ -344,7 +342,10 @@ public final class Player implements IPlayer
                 setTime(0);
                 
                 //change the state to game over
-                game.getMainScreen().setState(MainScreen.State.GameOver);
+                game.getMainScreen().setState(ScreenManager.State.GameOver);
+                
+                //assign message to display to user
+                game.getMainScreen().getScreenGameover().setMessage("Time up");
                 
                 //play sound effect
                 Audio.play(Assets.AudioGameKey.TimeUp);
@@ -429,6 +430,7 @@ public final class Player implements IPlayer
         canvas.drawRect(GOAL_X, GOAL_Y, GOAL_X + (Player.PROGRESS_GOAL * 2), GOAL_Y + 20, game.getPaint());
         game.getPaint().setStyle(Paint.Style.FILL);
         
+        //draw the progress bar
         if (progress >= Player.PROGRESS_GOAL)
         {
             canvas.drawRect(GOAL_X, GOAL_Y, GOAL_X + (Player.PROGRESS_GOAL * 2), GOAL_Y + 20, game.getPaint());

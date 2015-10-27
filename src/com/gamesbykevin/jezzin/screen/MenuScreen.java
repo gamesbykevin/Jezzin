@@ -27,7 +27,7 @@ public class MenuScreen implements Screen, Disposable
     private final Bitmap logo;
     
     //our main screen reference
-    private final MainScreen screen;
+    private final ScreenManager screen;
     
     //the buttons on the menu screen
     private HashMap<Key, Button> buttons;
@@ -70,7 +70,7 @@ public class MenuScreen implements Screen, Disposable
     //start new game, and did we notify user
     private boolean reset = false, notify = false;
     
-    public MenuScreen(final MainScreen screen)
+    public MenuScreen(final ScreenManager screen)
     {
         //store reference to the logo
         this.logo = Images.getImage(Assets.ImageMenuKey.Logo);
@@ -84,46 +84,46 @@ public class MenuScreen implements Screen, Disposable
         //temp button
         Button tmp;
         
-        int y = MainScreen.BUTTON_Y;
+        int y = ScreenManager.BUTTON_Y;
         
-        y += MainScreen.BUTTON_Y_INCREMENT;
+        y += ScreenManager.BUTTON_Y_INCREMENT;
         tmp = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        tmp.setX(MainScreen.BUTTON_X);
+        tmp.setX(ScreenManager.BUTTON_X);
         tmp.setY(y);
         tmp.setText(BUTTON_TEXT_START_GAME);
         this.buttons.put(Key.Start, tmp);
         
-        y += MainScreen.BUTTON_Y_INCREMENT;
+        y += ScreenManager.BUTTON_Y_INCREMENT;
         tmp = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        tmp.setX(MainScreen.BUTTON_X);
+        tmp.setX(ScreenManager.BUTTON_X);
         tmp.setY(y);
         tmp.setText(BUTTON_TEXT_OPTIONS);
         this.buttons.put(Key.Settings, tmp);
         
-        y += MainScreen.BUTTON_Y_INCREMENT;
+        y += ScreenManager.BUTTON_Y_INCREMENT;
         tmp = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        tmp.setX(MainScreen.BUTTON_X);
+        tmp.setX(ScreenManager.BUTTON_X);
         tmp.setY(y);
         tmp.setText(BUTTON_TEXT_INSTRUCTIONS);
         this.buttons.put(Key.Instructions, tmp);
         
-        y += MainScreen.BUTTON_Y_INCREMENT;
+        y += ScreenManager.BUTTON_Y_INCREMENT;
         tmp = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        tmp.setX(MainScreen.BUTTON_X);
+        tmp.setX(ScreenManager.BUTTON_X);
         tmp.setY(y);
         tmp.setText(BUTTON_TEXT_RATE_APP);
         this.buttons.put(Key.Rate, tmp);
         
-        y += MainScreen.BUTTON_Y_INCREMENT;
+        y += ScreenManager.BUTTON_Y_INCREMENT;
         tmp = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        tmp.setX(MainScreen.BUTTON_X);
+        tmp.setX(ScreenManager.BUTTON_X);
         tmp.setY(y);
         tmp.setText(BUTTON_TEXT_MORE_GAMES);
         this.buttons.put(Key.More, tmp);
         
-        y += MainScreen.BUTTON_Y_INCREMENT;
+        y += ScreenManager.BUTTON_Y_INCREMENT;
         tmp = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        tmp.setX(MainScreen.BUTTON_X);
+        tmp.setX(ScreenManager.BUTTON_X);
         tmp.setY(y);
         tmp.setText(BUTTON_TEXT_EXIT_GAME);
         this.buttons.put(Key.Exit, tmp);
@@ -167,7 +167,7 @@ public class MenuScreen implements Screen, Disposable
             else if (buttons.get(Key.Settings).contains(x, y))
             {
                 //set the state
-                screen.setState(MainScreen.State.Options);
+                screen.setState(ScreenManager.State.Options);
                 
                 //play sound effect
                 Audio.play(Assets.AudioMenuKey.Selection);
@@ -239,7 +239,7 @@ public class MenuScreen implements Screen, Disposable
             screen.getScreenGame().createGame();
 
             //set running state
-            screen.setState(MainScreen.State.Running);
+            screen.setState(ScreenManager.State.Running);
 
             //play sound effect
             Audio.play(Assets.AudioMenuKey.Selection);
@@ -260,7 +260,7 @@ public class MenuScreen implements Screen, Disposable
         else
         {
             //draw main logo
-            canvas.drawBitmap(logo, MainScreen.LOGO_X, MainScreen.LOGO_Y, null);
+            canvas.drawBitmap(logo, ScreenManager.LOGO_X, ScreenManager.LOGO_Y, null);
 
             //draw the menu buttons
             if (buttons != null)

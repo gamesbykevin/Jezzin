@@ -25,7 +25,7 @@ import com.gamesbykevin.jezzin.player.Player;
 public class GameoverScreen implements Screen, Disposable
 {
     //our main screen reference
-    private final MainScreen screen;
+    private final ScreenManager screen;
     
     //object to paint background
     private Paint paintMessage;
@@ -65,18 +65,18 @@ public class GameoverScreen implements Screen, Disposable
      */
     private static final String BUTTON_TEXT_MENU = "Menu";
     
-    public GameoverScreen(final MainScreen screen)
+    public GameoverScreen(final ScreenManager screen)
     {
         //store our parent reference
         this.screen = screen;
         
         //the start location of the button
-        int y = MainScreen.BUTTON_Y;
+        int y = ScreenManager.BUTTON_Y;
 
         //create our buttons
-        y += MainScreen.BUTTON_Y_INCREMENT;
+        y += ScreenManager.BUTTON_Y_INCREMENT;
         this.next = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        this.next.setX(MainScreen.BUTTON_X);
+        this.next.setX(ScreenManager.BUTTON_X);
         this.next.setY(y);
         this.next.updateBounds();
         this.next.setText(BUTTON_TEXT_NEW_GAME);
@@ -84,23 +84,23 @@ public class GameoverScreen implements Screen, Disposable
         
         //will be in same position as next
         this.replay = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        this.replay.setX(MainScreen.BUTTON_X);
+        this.replay.setX(ScreenManager.BUTTON_X);
         this.replay.setY(y);
         this.replay.updateBounds();
         this.replay.setText(BUTTON_TEXT_REPLAY);
         this.replay.positionText(screen.getPaint());
         
-        y += MainScreen.BUTTON_Y_INCREMENT;
+        y += ScreenManager.BUTTON_Y_INCREMENT;
         this.menu = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        this.menu.setX(MainScreen.BUTTON_X);
+        this.menu.setX(ScreenManager.BUTTON_X);
         this.menu.setY(y);
         this.menu.updateBounds();
         this.menu.setText(BUTTON_TEXT_MENU);
         this.menu.positionText(screen.getPaint());
         
-        y += MainScreen.BUTTON_Y_INCREMENT;
+        y += ScreenManager.BUTTON_Y_INCREMENT;
         this.rate = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        this.rate.setX(MainScreen.BUTTON_X);
+        this.rate.setX(ScreenManager.BUTTON_X);
         this.rate.setY(y);
         this.rate.updateBounds();
         this.rate.setText(MenuScreen.BUTTON_TEXT_RATE_APP);
@@ -166,7 +166,7 @@ public class GameoverScreen implements Screen, Disposable
                 screen.getScreenGame().getGame().reset(screen.getScreenGame().getGame().getBalls().getBalls().size() + 1);
                 
                 //move back to the game
-                screen.setState(MainScreen.State.Running);
+                screen.setState(ScreenManager.State.Running);
                 
                 //play sound effect
                 Audio.play(Assets.AudioMenuKey.Selection);
@@ -183,7 +183,7 @@ public class GameoverScreen implements Screen, Disposable
                 screen.getScreenGame().getGame().reset(screen.getScreenGame().getGame().getBalls().getBalls().size());
                 
                 //move back to the game
-                screen.setState(MainScreen.State.Running);
+                screen.setState(ScreenManager.State.Running);
                 
                 //play sound effect
                 Audio.play(Assets.AudioMenuKey.Selection);
@@ -197,7 +197,7 @@ public class GameoverScreen implements Screen, Disposable
                 setMessage("");
                 
                 //move to the main menu
-                screen.setState(MainScreen.State.Ready);
+                screen.setState(ScreenManager.State.Ready);
                 
                 //play sound effect
                 Audio.play(Assets.AudioMenuKey.Selection);
@@ -239,13 +239,11 @@ public class GameoverScreen implements Screen, Disposable
                 //if we did not meet the progress, then we lost
                 if (screen.getScreenGame().getGame().getBoundaries().getTotalProgress() < Player.PROGRESS_GOAL)
                 {
-                    setMessage("You lose!!!");
                     next.setVisible(false);
                     replay.setVisible(!next.isVisible());
                 }
                 else
                 {
-                    setMessage("Success");
                     next.setVisible(true);
                     replay.setVisible(!next.isVisible());
                 }
@@ -256,26 +254,21 @@ public class GameoverScreen implements Screen, Disposable
     @Override
     public void render(final Canvas canvas) throws Exception
     {
-        //if the menu is displayed we will darken the background accordingly
         if (display)
         {
             //only darken the background when the menu is displayed
-            MainScreen.darkenBackground(canvas);
-        }
+            ScreenManager.darkenBackground(canvas);
+            
+            if (paintMessage != null)
+            {
+                //calculate middle
+                final int x = (GamePanel.WIDTH / 2) - (pixelW / 2);
+                final int y = (int)(GamePanel.HEIGHT * .1);
+
+                //draw text
+                canvas.drawText(this.message, x, y, paintMessage);
+            }
         
-        if (paintMessage != null)
-        {
-            //calculate middle
-            final int x = (GamePanel.WIDTH / 2) - (pixelW / 2);
-            final int y = (int)(GamePanel.HEIGHT * .15);
-             
-            //draw text
-            canvas.drawText(this.message, x, y, paintMessage);
-        }
-        
-        //do we display the menu
-        if (display)
-        {
             //render buttons
             next.render(canvas, screen.getPaint());
             replay.render(canvas, screen.getPaint());
