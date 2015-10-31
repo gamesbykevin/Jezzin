@@ -1,9 +1,6 @@
 package com.gamesbykevin.jezzin.panel;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Rect;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -12,7 +9,6 @@ import com.gamesbykevin.androidframework.resources.Audio;
 import com.gamesbykevin.androidframework.resources.Disposable;
 
 import com.gamesbykevin.jezzin.MainActivity;
-import com.gamesbykevin.jezzin.R;
 import com.gamesbykevin.jezzin.assets.Assets;
 import com.gamesbykevin.jezzin.screen.ScreenManager;
 import com.gamesbykevin.jezzin.thread.MainThread;
@@ -43,15 +39,6 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback, Di
     //our main game thread
     private MainThread thread;
     
-    //splash loading screen
-    private Bitmap splash;
-    
-    //did we notify the user of loading
-    private boolean notify = false;
-    
-    //the source and destination used to render the splash image
-    private Rect source, destination;
-    
     /**
      * Create a new game panel
      * @param activity Our main activity reference
@@ -66,9 +53,6 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback, Di
             
         //make game panel focusable = true so it can handle events
         super.setFocusable(true);
-        
-        //load splash image to be displayed to the user
-        splash = BitmapFactory.decodeResource(activity.getResources(), R.drawable.splash);
     }
     
     @Override
@@ -80,6 +64,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback, Di
         //count number of attempts to complete thread
         int count = 0;
         
+        //here we will attempt to stop the thread
         while (retry && count <= MainThread.COMPLETE_THREAD_ATTEMPTS)
         {
             try
@@ -117,10 +102,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback, Di
             screen = null;
         }
         
-        if (splash != null)
-            splash = null;
-        
-        //recycle asset objects
+        //recycle all asset objects
         Assets.recycle();
     }
     
@@ -142,11 +124,8 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback, Di
     {
         try
         {
-            //flag assets as not loaded
-            Assets.LOADED = false;
-            
-            //flag we did not notify
-            notify = false;
+            //load assets
+            Assets.load(getActivity());
             
             //create if null
             if (RANDOM == null)
@@ -201,12 +180,6 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback, Di
     @Override
     public void surfaceDestroyed(SurfaceHolder holder)
     {
-        //flag assets as not loaded
-        Assets.LOADED = false;
-        
-        //flag we did not notify
-        notify = false;
-        
         //pause the game
         if (screen != null)
         {
@@ -231,28 +204,18 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback, Di
     {
         try
         {
-            if (notify)
+            //make sure the screen is created first before the thread starts
+            if (this.screen == null)
             {
-                //make sure the screen is created first before the thread starts
-                if (this.screen == null)
-                {
-                    if (!Assets.LOADED)
-                    {
-                        //load all assets
-                        Assets.load(getActivity());
+                //load all assets
+                Assets.load(getActivity());
 
-                        //flag assets loaded
-                        Assets.LOADED = true;
-                    }
-                    else
-                    {
-                        this.screen = new ScreenManager(this);
-                    }
-                }
-                else
-                {
-                    screen.update();
-                }
+                //create new screen manager
+                this.screen = new ScreenManager(this);
+            }
+            else
+            {
+                screen.update();
             }
         }
         catch (Exception e)
@@ -271,33 +234,15 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback, Di
             
             try
             {
-                final float scaleFactorX = getWidth() / (float)GamePanel.WIDTH;
-                final float scaleFactorY = getHeight() / (float)GamePanel.HEIGHT;
-
-                //scale to the screen size
-                canvas.scale(scaleFactorX, scaleFactorY);
-                
-                //render splash image
-                if (splash != null)
-                {
-                    if (screen == null)
-                    {
-                        if (source == null)
-                            source = new Rect(0, 0, GamePanel.WIDTH, GamePanel.HEIGHT);
-                        if (destination == null)
-                            destination = new Rect(0, 0, getWidth(), getHeight());
-                        
-                        //render image
-                        canvas.drawBitmap(splash, source, destination, null);
-                    }
-
-                    //flag notify
-                    notify = true;
-                }
-                
                 //make sure the screen object exists
                 if (screen != null)
                 {
+                    final float scaleFactorX = getWidth() / (float)GamePanel.WIDTH;
+                    final float scaleFactorY = getHeight() / (float)GamePanel.HEIGHT;
+
+                    //scale to the screen size
+                    canvas.scale(scaleFactorX, scaleFactorY);
+                
                     //render the main sreen containing the game and other screens
                     screen.render(canvas);
                 }

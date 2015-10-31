@@ -65,6 +65,14 @@ public class MainActivity extends Activity
     @Override
     public void finish()
     {
+        //cleanup game panel if it exists
+        if (getGamePanel() != null)
+        {
+            getGamePanel().dispose();
+            setGamePanel(null);
+        }
+        
+        //call parent
         super.finish();
     }
     
@@ -74,6 +82,7 @@ public class MainActivity extends Activity
     @Override
     public void onStart()
     {
+        //call parent
         super.onStart();
     }
     
@@ -83,6 +92,7 @@ public class MainActivity extends Activity
     @Override
     public void onStop()
     {
+        //call parent
         super.onStop();
     }
     
@@ -92,15 +102,8 @@ public class MainActivity extends Activity
     @Override
     public void onDestroy()
     {
-        //cleanup game panel
-        if (getGamePanel() != null)
-        {
-            getGamePanel().dispose();
-            setGamePanel(null);
-        }
-        
-        //finish the current activity
-        super.finish();
+        //finish the activity
+        this.finish();
         
         //perform final cleanup
         super.onDestroy();

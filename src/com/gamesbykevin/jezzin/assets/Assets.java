@@ -11,11 +11,6 @@ import com.gamesbykevin.androidframework.resources.*;
 public class Assets 
 {
     /**
-     * Have the assets been loaded
-     */
-    public static boolean LOADED = false;
-    
-    /**
      * The directory where audio sound effect resources are kept
      */
     private static final String DIRECTORY_MENU_AUDIO = "audio/menu";
@@ -204,9 +199,16 @@ public class Assets
      */
     public static void recycle()
     {
-        Images.dispose();
-        Font.dispose();
-        Audio.dispose();
-        Files.dispose();
+        try
+        {
+            Images.dispose();
+            Font.dispose();
+            Audio.dispose();
+            Files.dispose();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 }
