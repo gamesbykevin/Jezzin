@@ -4,8 +4,6 @@ import android.graphics.Canvas;
 import android.view.MotionEvent;
 import com.gamesbykevin.androidframework.resources.Disposable;
 import com.gamesbykevin.androidframework.screen.Screen;
-import com.gamesbykevin.jezzin.assets.Assets;
-import com.gamesbykevin.jezzin.balls.Balls;
 import com.gamesbykevin.jezzin.game.Game;
 import com.gamesbykevin.jezzin.player.Player;
 
@@ -20,9 +18,6 @@ public class GameScreen implements Screen, Disposable
     
     //our main screen reference
     private final ScreenManager screen;
-    
-    //are we loading game assets? (image/audio/font etc...)
-    private boolean loading = true;
     
     public GameScreen(final ScreenManager screen)
     {

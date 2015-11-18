@@ -70,7 +70,7 @@ public final class Balls extends Entity implements IBalls
     /**
      * The maximum number of balls allowed
      */
-    public static final int BALL_MAX = 20;
+    public static final int BALL_MAX = 15;
     
     /**
      * The minimum number of balls allowed
@@ -302,7 +302,8 @@ public final class Balls extends Entity implements IBalls
                 BallsHelper.checkBallVelocity(ball, game.getBoundaries().getBoundary(ball.getIndex()));
 
                 //update the current ball
-                ball.update();
+                ball.setX(ball.getX() + ball.getDX());
+                ball.setY(ball.getY() + ball.getDY());
             }
         }
     }

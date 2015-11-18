@@ -1,7 +1,6 @@
 package com.gamesbykevin.jezzin.game;
 
 import com.gamesbykevin.androidframework.resources.Disposable;
-import com.gamesbykevin.jezzin.assets.Assets;
 
 /**
  * Game interface methods

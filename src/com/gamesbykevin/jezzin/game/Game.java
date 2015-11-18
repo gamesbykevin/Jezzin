@@ -5,9 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.MotionEvent;
 
-import com.gamesbykevin.androidframework.base.Cell;
 import com.gamesbykevin.androidframework.resources.Font;
-import com.gamesbykevin.androidframework.resources.Images;
 import com.gamesbykevin.androidframework.text.TimeFormat;
 
 import com.gamesbykevin.jezzin.assets.Assets;
@@ -19,7 +17,6 @@ import com.gamesbykevin.jezzin.player.Player;
 import com.gamesbykevin.jezzin.storage.scorecard.Score;
 import com.gamesbykevin.jezzin.storage.scorecard.ScoreCard;
 import com.gamesbykevin.jezzin.screen.ScreenManager;
-import com.gamesbykevin.jezzin.screen.ScreenManager.State;
 
 /**
  * The main game logic will happen here
@@ -36,7 +33,7 @@ public final class Game implements IGame
     //our storage object used to save data
     private ScoreCard scorecard;
     
-    //our controller objet
+    //our controller object
     private Controller controller;
     
     //our balls
@@ -170,7 +167,6 @@ public final class Game implements IGame
         {
             //get the score reference for the current level and difficulty
             score = getScoreCard().getScore(
-                getMainScreen().getScreenOptions().getModeIndex(), 
                 getMainScreen().getScreenOptions().getDifficultyIndex(), 
                 level
             );
@@ -188,13 +184,13 @@ public final class Game implements IGame
         {
             case Player.MODE_INDEX_CASUAL:
             default:
-                getPlayer().setCountdown(false);
+                getPlayer().setCountdown(false, 0);
                 break;
                 
             case Player.MODE_INDEX_SURVIVIAL:
                 
                 //we won't count down the clock
-                getPlayer().setCountdown(false);
+                getPlayer().setCountdown(false, 0);
                 
                 //player will only have 1 life
                 getPlayer().setLives(1);
@@ -203,19 +199,17 @@ public final class Game implements IGame
             case Player.MODE_INDEX_CHALLENGE:
                 if (score != null)
                 {
-                    getPlayer().setCountdown(true);
-                    getPlayer().setTime(score.getTime());
+                    getPlayer().setCountdown(true, score.getTime());
                 }
                 else
                 {
                     //if there is no previous score we will count up
-                    getPlayer().setCountdown(false);
+                    getPlayer().setCountdown(false, 0);
                 }
                 break;
                 
             case Player.MODE_INDEX_TIMED:
-                getPlayer().setCountdown(true);
-                getPlayer().setTime(level * TIMED_DELAY_PER_BALL);
+                getPlayer().setCountdown(true, level * TIMED_DELAY_PER_BALL);
                 break;
         }
         
@@ -250,7 +244,7 @@ public final class Game implements IGame
         //only update game if no controller buttons were clicked
         if (getController() != null && !getController().updateMotionEvent(event, x, y))
         {
-            //makre sure draw isn't in progress
+            //make sure draw isn't in progress
             if (getBoundaries() != null && !getBoundaries().hasDraw())
             {
                 if (getPlayer() != null)

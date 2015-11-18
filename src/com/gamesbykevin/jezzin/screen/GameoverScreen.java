@@ -79,15 +79,16 @@ public class GameoverScreen implements Screen, Disposable
         this.next.setX(ScreenManager.BUTTON_X);
         this.next.setY(y);
         this.next.updateBounds();
-        this.next.setText(BUTTON_TEXT_NEW_GAME);
+        this.next.addDescription(BUTTON_TEXT_NEW_GAME);
         this.next.positionText(screen.getPaint());
         
         //will be in same position as next
+        y += ScreenManager.BUTTON_Y_INCREMENT;
         this.replay = new Button(Images.getImage(Assets.ImageMenuKey.Button));
         this.replay.setX(ScreenManager.BUTTON_X);
         this.replay.setY(y);
         this.replay.updateBounds();
-        this.replay.setText(BUTTON_TEXT_REPLAY);
+        this.replay.addDescription(BUTTON_TEXT_REPLAY);
         this.replay.positionText(screen.getPaint());
         
         y += ScreenManager.BUTTON_Y_INCREMENT;
@@ -95,7 +96,7 @@ public class GameoverScreen implements Screen, Disposable
         this.menu.setX(ScreenManager.BUTTON_X);
         this.menu.setY(y);
         this.menu.updateBounds();
-        this.menu.setText(BUTTON_TEXT_MENU);
+        this.menu.addDescription(BUTTON_TEXT_MENU);
         this.menu.positionText(screen.getPaint());
         
         y += ScreenManager.BUTTON_Y_INCREMENT;
@@ -103,7 +104,7 @@ public class GameoverScreen implements Screen, Disposable
         this.rate.setX(ScreenManager.BUTTON_X);
         this.rate.setY(y);
         this.rate.updateBounds();
-        this.rate.setText(MenuScreen.BUTTON_TEXT_RATE_APP);
+        this.rate.addDescription(MenuScreen.BUTTON_TEXT_RATE_APP);
         this.rate.positionText(screen.getPaint());
     }
     
@@ -174,7 +175,7 @@ public class GameoverScreen implements Screen, Disposable
                 //we don't request additional motion events
                 return false;
             }
-            else if (replay.contains(x, y) && replay.isVisible())
+            else if (replay.contains(x, y))
             {
                 //remove message
                 setMessage("");
@@ -236,16 +237,55 @@ public class GameoverScreen implements Screen, Disposable
             {
                 display = true;
                 
+                int y = ScreenManager.BUTTON_Y;
+                
                 //if we did not meet the progress, then we lost
                 if (screen.getScreenGame().getGame().getBoundaries().getTotalProgress() < Player.PROGRESS_GOAL)
                 {
                     next.setVisible(false);
-                    replay.setVisible(!next.isVisible());
+                    
+                    //will be in same position as next
+                    y += ScreenManager.BUTTON_Y_INCREMENT;
+                    this.replay.setY(y);
+                    this.replay.updateBounds();
+                    this.replay.positionText(screen.getPaint());
+                    
+                    y += ScreenManager.BUTTON_Y_INCREMENT;
+                    this.menu.setY(y);
+                    this.menu.updateBounds();
+                    this.menu.positionText(screen.getPaint());
+                    
+                    y += ScreenManager.BUTTON_Y_INCREMENT;
+                    this.rate.setY(y);
+                    this.rate.updateBounds();
+                    this.rate.positionText(screen.getPaint());
                 }
                 else
                 {
                     next.setVisible(true);
-                    replay.setVisible(!next.isVisible());
+
+                    //create our buttons
+                    y += ScreenManager.BUTTON_Y_INCREMENT;
+                    this.next.setY(y);
+                    this.next.updateBounds();
+                    this.next.addDescription(BUTTON_TEXT_NEW_GAME);
+                    this.next.positionText(screen.getPaint());
+                    
+                    //will be in same position as next
+                    y += ScreenManager.BUTTON_Y_INCREMENT;
+                    this.replay.setY(y);
+                    this.replay.updateBounds();
+                    this.replay.positionText(screen.getPaint());
+                    
+                    y += ScreenManager.BUTTON_Y_INCREMENT;
+                    this.menu.setY(y);
+                    this.menu.updateBounds();
+                    this.menu.positionText(screen.getPaint());
+                    
+                    y += ScreenManager.BUTTON_Y_INCREMENT;
+                    this.rate.setY(y);
+                    this.rate.updateBounds();
+                    this.rate.positionText(screen.getPaint());
                 }
             }
         }

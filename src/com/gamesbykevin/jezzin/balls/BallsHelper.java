@@ -65,8 +65,10 @@ public final class BallsHelper
             tmp.setDY(dy1);
 
             //move the balls
-            ball.update();
-            tmp.update();
+            ball.setX(ball.getX() + ball.getDX());
+            ball.setY(ball.getY() + ball.getDY());
+            tmp.setX(tmp.getX() + tmp.getDX());
+            tmp.setY(tmp.getY() + tmp.getDY());
         }
     }
     

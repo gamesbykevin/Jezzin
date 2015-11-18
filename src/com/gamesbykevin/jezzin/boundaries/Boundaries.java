@@ -9,13 +9,11 @@ import com.gamesbykevin.androidframework.anim.Animation;
 import com.gamesbykevin.androidframework.base.Entity;
 import com.gamesbykevin.androidframework.resources.Audio;
 import com.gamesbykevin.androidframework.resources.Images;
-import com.gamesbykevin.androidframework.text.TimeFormat;
 
 import com.gamesbykevin.jezzin.assets.Assets;
 import com.gamesbykevin.jezzin.game.Game;
 import com.gamesbykevin.jezzin.panel.GamePanel;
 import com.gamesbykevin.jezzin.player.Player;
-import com.gamesbykevin.jezzin.storage.scorecard.Score;
 import com.gamesbykevin.jezzin.screen.ScreenManager;
 
 import java.util.ArrayList;
@@ -115,27 +113,29 @@ public final class Boundaries extends Entity implements IBoundaries
      * If no, the draw will not happen.
      * @param startX starting x-coordinate
      * @param startY starting y-coordinate
-     * @param finishX finish x-coordinate
-     * @param finishY finish y-coordinate
      * @param dx x-velocity
      * @param dy y-velocity
      * @return true if we are successful in starting the draw, false otherwise
      */
-    public boolean startDraw(final int startX, final int startY, final int finishX, final int finishY, final double dx, final double dy)
+    public boolean startDraw(final int startX, final int startY, final double dx, final double dy)
     {
         if (boundaries != null)
         {
-            //track the start and finish indexes
-            int startI = -1, finishI = -1;
+            //track the start index
+            int startI = -1;
             
-            //check each boundary to locate the start/finish indeex
+            //check each boundary to locate the start/finish index
             for (int i = 0; i < getBoundaries().size(); i++)
             {
                 //store the index locations
                 if (getBoundary(i).contains(startX, startY))
+                {
+                	//store the index we 
                     startI = i;
-                if (getBoundary(i).contains(finishX, finishY))
-                    finishI = i;
+                    
+                    //no need to continue
+                    break;
+                }
             }
             
             //if the start index was not found, return false
@@ -152,7 +152,7 @@ public final class Boundaries extends Entity implements IBoundaries
             //reset progress
             resetProgress();
             
-            //can only move either veritcal or horizontal
+            //can only move either vertical or horizontal
             setDX((dy == 0) ? dx : 0);
             setDY((dx == 0) ? dy : 0);
             
@@ -339,7 +339,6 @@ public final class Boundaries extends Entity implements IBoundaries
                     
                     //update the score
                     final boolean result = getGame().getScoreCard().updateScore(
-                        getGame().getMainScreen().getScreenOptions().getModeIndex(), 
                         getGame().getMainScreen().getScreenOptions().getDifficultyIndex(), 
                         getGame().getPlayer().getLevel(), 
                         getGame().getPlayer().getTime()
@@ -373,15 +372,6 @@ public final class Boundaries extends Entity implements IBoundaries
                     //remove a life
                     getGame().getPlayer().setLives(getGame().getPlayer().getLives() - 1);
                     
-                    //remove flag from player
-                    getGame().getPlayer().setBegin(false);
-                    
-                    //we are done drawing
-                    setDraw(false);
-                    
-                    //reset progress
-                    resetProgress();
-                    
                     //if no more lives, the game is over
                     if (getGame().getPlayer().getLives() < 1)
                     {
@@ -395,6 +385,15 @@ public final class Boundaries extends Entity implements IBoundaries
                     }
                     else
                     {
+                        //remove flag from player
+                        getGame().getPlayer().setBegin(false);
+                        
+                        //we are done drawing
+                        setDraw(false);
+                        
+                        //reset progress
+                        resetProgress();
+                    	
                         //play sound effect
                         Audio.play(Assets.AudioGameKey.LoseLife);
                     }

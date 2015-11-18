@@ -31,9 +31,6 @@ public class OptionsScreen implements Screen, Disposable
     //list of buttons for the sound
     private List<Button> sounds;
     
-    //list of buttons for ball collision
-    private List<Button> collisions;
-    
     //list of buttons for the difficulties
     private List<Button> difficulties;
     
@@ -100,9 +97,6 @@ public class OptionsScreen implements Screen, Disposable
         addButtonsLevels(y);
         
         y += ScreenManager.BUTTON_Y_INCREMENT;
-        addButtonsCollision(y);
-        
-        y += ScreenManager.BUTTON_Y_INCREMENT;
         addButtonsBack(y);
         
         //create our settings object, which will load the previous settings
@@ -115,7 +109,7 @@ public class OptionsScreen implements Screen, Disposable
         this.modes = new ArrayList<Button>();
         
         Button button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        button.setText("Mode: " + Player.MODE_DESC_CASUAL);
+        button.addDescription("Mode: " + Player.MODE_DESC_CASUAL);
         button.setX(ScreenManager.BUTTON_X);
         button.setY(y);
         button.updateBounds();
@@ -123,7 +117,7 @@ public class OptionsScreen implements Screen, Disposable
         this.modes.add(button);
         
         button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        button.setText("Mode: " + Player.MODE_DESC_SURVIVAL);
+        button.addDescription("Mode: " + Player.MODE_DESC_SURVIVAL);
         button.setX(ScreenManager.BUTTON_X);
         button.setY(y);
         button.updateBounds();
@@ -131,7 +125,7 @@ public class OptionsScreen implements Screen, Disposable
         this.modes.add(button);
         
         button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        button.setText("Mode: " + Player.MODE_DESC_TIMED);
+        button.addDescription("Mode: " + Player.MODE_DESC_TIMED);
         button.setX(ScreenManager.BUTTON_X);
         button.setY(y);
         button.updateBounds();
@@ -139,7 +133,7 @@ public class OptionsScreen implements Screen, Disposable
         this.modes.add(button);
         
         button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        button.setText("Mode: " + Player.MODE_DESC_CHALLENGE);
+        button.addDescription("Mode: " + Player.MODE_DESC_CHALLENGE);
         button.setX(ScreenManager.BUTTON_X);
         button.setY(y);
         button.updateBounds();
@@ -155,7 +149,7 @@ public class OptionsScreen implements Screen, Disposable
         for (int i = 1; i <= Balls.BALL_MAX; i++)
         {
             Button button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-            button.setText("Level: " + i);
+            button.addDescription("Level: " + i);
             button.setX(ScreenManager.BUTTON_X);
             button.setY(y);
             button.updateBounds();
@@ -168,7 +162,7 @@ public class OptionsScreen implements Screen, Disposable
     {
         //the back button
         this.back = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        this.back.setText("Go Back");
+        this.back.addDescription("Go Back");
         this.back.setX(ScreenManager.BUTTON_X);
         this.back.setY(y);
         this.back.updateBounds();
@@ -181,7 +175,7 @@ public class OptionsScreen implements Screen, Disposable
         this.difficulties = new ArrayList<Button>();
         
         Button button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        button.setText("Difficulty: " + Player.DIFFICULTY_DESC_NORMAL);
+        button.addDescription("Difficulty: " + Player.DIFFICULTY_DESC_NORMAL);
         button.setX(ScreenManager.BUTTON_X);
         button.setY(y);
         button.updateBounds();
@@ -189,7 +183,7 @@ public class OptionsScreen implements Screen, Disposable
         this.difficulties.add(button);
         
         button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        button.setText("Difficulty: " + Player.DIFFICULTY_DESC_HARD);
+        button.addDescription("Difficulty: " + Player.DIFFICULTY_DESC_HARD);
         button.setX(ScreenManager.BUTTON_X);
         button.setY(y);
         button.updateBounds();
@@ -197,34 +191,12 @@ public class OptionsScreen implements Screen, Disposable
         this.difficulties.add(button);
         
         button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        button.setText("Difficulty: " + Player.DIFFICULTY_DESC_EASY);
+        button.addDescription("Difficulty: " + Player.DIFFICULTY_DESC_EASY);
         button.setX(ScreenManager.BUTTON_X);
         button.setY(y);
         button.updateBounds();
         button.positionText(paint);
         this.difficulties.add(button);
-    }
-    
-    private void addButtonsCollision(int y)
-    {
-        //add collision option
-        this.collisions = new ArrayList<Button>();
-        
-        Button button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        button.setText("Ball Collision: Disabled");
-        button.setX(ScreenManager.BUTTON_X);
-        button.setY(y);
-        button.updateBounds();
-        button.positionText(paint);
-        this.collisions.add(button);
-        
-        button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        button.setText("Ball Collision: Enabled");
-        button.setX(ScreenManager.BUTTON_X);
-        button.setY(y);
-        button.updateBounds();
-        button.positionText(paint);
-        this.collisions.add(button);
     }
     
     private void addButtonsSound(int y)
@@ -233,7 +205,7 @@ public class OptionsScreen implements Screen, Disposable
         this.sounds = new ArrayList<Button>();
         
         Button button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        button.setText("Sound: Disabled");
+        button.addDescription("Sound: Disabled");
         button.setX(ScreenManager.BUTTON_X);
         button.setY(y);
         button.updateBounds();
@@ -241,7 +213,7 @@ public class OptionsScreen implements Screen, Disposable
         this.sounds.add(button);
         
         button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        button.setText("Sound: Enabled");
+        button.addDescription("Sound: Enabled");
         button.setX(ScreenManager.BUTTON_X);
         button.setY(y);
         button.updateBounds();
@@ -329,21 +301,6 @@ public class OptionsScreen implements Screen, Disposable
                 {
                     //move to the next seletion
                     setDifficultyIndex(getDifficultyIndex() + 1);
-                    
-                    //play sound effect
-                    Audio.play(Assets.AudioMenuKey.Selection);
-                    
-                    //exit loop
-                    return false;
-                }
-            }
-            
-            for (Button button : collisions)
-            {
-                if (button.contains(x, y))
-                {
-                    //flip setting
-                    setCollision(!hasCollision());
                     
                     //play sound effect
                     Audio.play(Assets.AudioMenuKey.Selection);
@@ -453,7 +410,6 @@ public class OptionsScreen implements Screen, Disposable
         
         //draw the menu buttons
         sounds.get(Audio.isAudioEnabled() ? 1 : 0).render(canvas, paint);
-        collisions.get(hasCollision() ? 1 : 0).render(canvas, paint);
         difficulties.get(getDifficultyIndex()).render(canvas, paint);
         levels.get(getLevelIndex()).render(canvas, paint);
         modes.get(getModeIndex()).render(canvas, paint);
@@ -505,21 +461,6 @@ public class OptionsScreen implements Screen, Disposable
             
             difficulties.clear();
             difficulties = null;
-        }
-        
-        if (collisions != null)
-        {
-            for (Button button : collisions)
-            {
-                if (button != null)
-                {
-                    button.dispose();
-                    button = null;
-                }
-            }
-            
-            collisions.clear();
-            collisions = null;
         }
         
         if (sounds != null)

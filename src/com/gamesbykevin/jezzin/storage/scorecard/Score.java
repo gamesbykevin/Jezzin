@@ -15,25 +15,12 @@ public final class Score
     //the difficulty this score is for
     private final int difficultyIndex;
     
-    //the mode this score is for
-    private final int modeIndex;
-    
-    protected Score(final int modeIndex, final int difficultyIndex, final int level, final long time)
+    protected Score(final int difficultyIndex, final int level, final long time)
     {
-        this.modeIndex = modeIndex;
         this.difficultyIndex = difficultyIndex;
         
         setLevel(level);
         setTime(time);
-    }
-    
-    /**
-     * Get the mode index
-     * @return The mode this score is for
-     */
-    public int getModeIndex()
-    {
-        return this.modeIndex;
     }
     
     /**

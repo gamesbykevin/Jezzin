@@ -43,7 +43,7 @@ public final class Player implements IPlayer
     public static final String TIME_FORMAT = "mm:ss.SSS";
     
     //the starting point
-    private double startX, startY;
+    private float startX, startY;
 
     //our game reference
     private final Game game;
@@ -55,9 +55,12 @@ public final class Player implements IPlayer
     private int level;
     
     //the timer
-    private long time;
+    private long elapsed;
     
-    //the previosu time to track the timer
+    //if we are counting down the time
+    private long timeLeft;
+    
+    //the previous time to track the timer
     private long previous;
     
     //our timer and best timer and difficulty description
@@ -110,7 +113,7 @@ public final class Player implements IPlayer
     {
         super();
         
-        //store our game refernce
+        //store our game reference
         this.game = game;
         
         //reset
@@ -121,12 +124,21 @@ public final class Player implements IPlayer
     }
     
     /**
-     * Flag the countdown
-     * @param countdown true = we will countdown the timer, false = we will count up
+     * Flag the count down
+     * @param countdown true = we will count down the timer, false = we will count up
      */
-    public void setCountdown(final boolean countdown)
+    /**
+     * Flag the count down
+     * @param countdown true = we will count down the timer, false otherwise
+     * @param timeLeft The time to count down from
+     */
+    public void setCountdown(final boolean countdown, final long timeLeft)
     {
+    	//assign flag
         this.countdown = countdown;
+        
+        //assign count down time
+        this.timeLeft = timeLeft;
     }
     
     /**
@@ -195,21 +207,21 @@ public final class Player implements IPlayer
     }
     
     /**
-     * Get the time
+     * Get the elapsed time
      * @return The total time
      */
     public long getTime()
     {
-        return this.time;
+        return this.elapsed;
     }
     
     /**
-     * Set the time
+     * Set the elapsed time
      * @param time The time milliseconds of the timer
      */
-    public void setTime(final long time)
+    public void setTime(final long elapsed)
     {
-        this.time = time;
+        this.elapsed = elapsed;
     }
     
     /**
@@ -274,48 +286,66 @@ public final class Player implements IPlayer
         
         switch (event.getAction())
         {
-            case MotionEvent.ACTION_CANCEL:
-            case MotionEvent.ACTION_OUTSIDE:
-                //if offscreen
-                setBegin(false);
-                break;
-                
             case MotionEvent.ACTION_DOWN:
+            	//if we already began, don't continue
+            	if (hasBegin())
+            		return;
+            	
                 //flag start
                 setBegin(true);
 
                 //set location
-                startX = x;
-                startY = y;
+                this.startX = x;
+                this.startY = y;
                 break;
                 
+            case MotionEvent.ACTION_MOVE:
+            	//don't continue if we did not begin
+            	if (!hasBegin())
+            		return;
+            	
+            	//start the swipe
+            	startSwipe(x, y);
+            	break;
+                
+            /*
             case MotionEvent.ACTION_UP:
                 //don't continue if we did not begin
                 if (!hasBegin())
                     return;
 
-                //identify the difference between user start and finish
-                final double xDiff = (startX > x) ? startX - x : x - startX;
-                final double yDiff = (startY > y) ? startY - y : y - startY;
-
-                //result after starting draw
-                boolean result = false;
-
-                //determine which direction the wall is generated
-                if (xDiff > yDiff)
-                {
-                    result = game.getBoundaries().startDraw((int)startX, (int)startY, (int)x, (int)y, getVelocity(), VELOCITY_NONE);
-                }
-                else if (yDiff > xDiff)
-                {
-                    result = game.getBoundaries().startDraw((int)startX, (int)startY, (int)x, (int)y, VELOCITY_NONE, getVelocity());
-                }
-
-                //if not successful we can try again
-                if (!result)
-                    setBegin(false);
                 break;
+           	*/
         }
+    }
+    
+    /**
+     * Start the swipe
+     * @param x The new x-coordinate
+     * @param y The new y-coordinate
+     */
+    private void startSwipe(final float x, final float y)
+    {
+        //identify the difference between user start and finish
+        final float xDiff = (startX > x) ? startX - x : x - startX;
+        final float yDiff = (startY > y) ? startY - y : y - startY;
+
+        //result after starting draw
+        boolean result = false;
+
+        //determine which direction the wall is generated
+        if (xDiff > yDiff)
+        {
+            result = game.getBoundaries().startDraw((int)startX, (int)startY, getVelocity(), VELOCITY_NONE);
+        }
+        else if (yDiff > xDiff)
+        {
+            result = game.getBoundaries().startDraw((int)startX, (int)startY, VELOCITY_NONE, getVelocity());
+        }
+
+        //if not successful we can try again
+        if (!result)
+            setBegin(false);
     }
     
     @Override
@@ -331,15 +361,18 @@ public final class Player implements IPlayer
         //get the current time
         final long current = System.currentTimeMillis();
         
+        //add the difference to the total time
+        setTime(getTime() + (current - previous));
+        
         if (countdown)
         {
-            //subtract the difference to the total time
-            this.time -= (current - previous);
+            //update the time description with the difference since we are counting down
+            this.setTimeDesc(TimeFormat.getDescription(TIME_FORMAT, timeLeft - getTime()));
             
-            if (getTime() < 0)
+            if (timeLeft - getTime() < 0)
             {
-                //set time to 0
-                setTime(0);
+            	//set the time description
+            	this.setTimeDesc("00:00.000");
                 
                 //change the state to game over
                 game.getMainScreen().setState(ScreenManager.State.GameOver);
@@ -356,12 +389,9 @@ public final class Player implements IPlayer
         }
         else
         {
-            //add the difference to the total time
-            this.time += (current - previous);
+            //update the time description
+            this.setTimeDesc(TimeFormat.getDescription(TIME_FORMAT, getTime()));
         }
-        
-        //update the time description
-        this.setTimeDesc(TimeFormat.getDescription(TIME_FORMAT, getTime()));
         
         //update the previous
         this.previous = current;
@@ -374,7 +404,7 @@ public final class Player implements IPlayer
         setBegin(false);
         
         //reset time stats
-        this.time = 0;
+        this.elapsed = 0;
         this.previous = 0;
         this.stop = true;
         this.setTimeDesc(TimeFormat.getDescription(TIME_FORMAT, getTime()));

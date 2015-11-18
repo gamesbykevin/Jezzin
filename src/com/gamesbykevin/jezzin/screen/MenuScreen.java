@@ -2,8 +2,6 @@ package com.gamesbykevin.jezzin.screen;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.view.MotionEvent;
 
 import com.gamesbykevin.androidframework.awt.Button;
@@ -12,7 +10,6 @@ import com.gamesbykevin.androidframework.resources.Disposable;
 import com.gamesbykevin.androidframework.resources.Images;
 import com.gamesbykevin.androidframework.screen.Screen;
 import com.gamesbykevin.jezzin.MainActivity;
-import com.gamesbykevin.jezzin.R;
 import com.gamesbykevin.jezzin.assets.Assets;
 
 import java.util.HashMap;
@@ -90,42 +87,42 @@ public class MenuScreen implements Screen, Disposable
         tmp = new Button(Images.getImage(Assets.ImageMenuKey.Button));
         tmp.setX(ScreenManager.BUTTON_X);
         tmp.setY(y);
-        tmp.setText(BUTTON_TEXT_START_GAME);
+        tmp.addDescription(BUTTON_TEXT_START_GAME);
         this.buttons.put(Key.Start, tmp);
         
         y += ScreenManager.BUTTON_Y_INCREMENT;
         tmp = new Button(Images.getImage(Assets.ImageMenuKey.Button));
         tmp.setX(ScreenManager.BUTTON_X);
         tmp.setY(y);
-        tmp.setText(BUTTON_TEXT_OPTIONS);
+        tmp.addDescription(BUTTON_TEXT_OPTIONS);
         this.buttons.put(Key.Settings, tmp);
         
         y += ScreenManager.BUTTON_Y_INCREMENT;
         tmp = new Button(Images.getImage(Assets.ImageMenuKey.Button));
         tmp.setX(ScreenManager.BUTTON_X);
         tmp.setY(y);
-        tmp.setText(BUTTON_TEXT_INSTRUCTIONS);
+        tmp.addDescription(BUTTON_TEXT_INSTRUCTIONS);
         this.buttons.put(Key.Instructions, tmp);
         
         y += ScreenManager.BUTTON_Y_INCREMENT;
         tmp = new Button(Images.getImage(Assets.ImageMenuKey.Button));
         tmp.setX(ScreenManager.BUTTON_X);
         tmp.setY(y);
-        tmp.setText(BUTTON_TEXT_RATE_APP);
+        tmp.addDescription(BUTTON_TEXT_RATE_APP);
         this.buttons.put(Key.Rate, tmp);
         
         y += ScreenManager.BUTTON_Y_INCREMENT;
         tmp = new Button(Images.getImage(Assets.ImageMenuKey.Button));
         tmp.setX(ScreenManager.BUTTON_X);
         tmp.setY(y);
-        tmp.setText(BUTTON_TEXT_MORE_GAMES);
+        tmp.addDescription(BUTTON_TEXT_MORE_GAMES);
         this.buttons.put(Key.More, tmp);
         
         y += ScreenManager.BUTTON_Y_INCREMENT;
         tmp = new Button(Images.getImage(Assets.ImageMenuKey.Button));
         tmp.setX(ScreenManager.BUTTON_X);
         tmp.setY(y);
-        tmp.setText(BUTTON_TEXT_EXIT_GAME);
+        tmp.addDescription(BUTTON_TEXT_EXIT_GAME);
         this.buttons.put(Key.Exit, tmp);
         
         for (Button button : buttons.values())
