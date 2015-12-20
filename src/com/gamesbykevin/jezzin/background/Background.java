@@ -77,7 +77,7 @@ public final class Background implements IBackground
         
         //load the asset
         Images.loadImage(
-            game.getMainScreen().getPanel().getActivity(), 
+            game.getScreen().getPanel().getActivity(), 
             previous, 
             Assets.DIRECTORY_GAME_IMAGE_BACKGROUNDS + "/" + previous.getFilename()
         );

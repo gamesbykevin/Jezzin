@@ -5,6 +5,7 @@ import android.app.Activity;
 import com.gamesbykevin.androidframework.io.storage.Internal;
 
 import com.gamesbykevin.jezzin.game.Game;
+import com.gamesbykevin.jezzin.screen.OptionsScreen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -161,7 +162,7 @@ public final class ScoreCard extends Internal
     public Score getScore()
     {
         return getScore(
-            game.getMainScreen().getScreenOptions().getDifficultyIndex(), 
+            game.getScreen().getScreenOptions().getIndex(OptionsScreen.INDEX_BUTTON_DIFFICULTY), 
             game.getPlayer().getLevel());
     }
     

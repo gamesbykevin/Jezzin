@@ -16,6 +16,7 @@ import com.gamesbykevin.jezzin.game.controller.Controller;
 import com.gamesbykevin.jezzin.player.Player;
 import com.gamesbykevin.jezzin.storage.scorecard.Score;
 import com.gamesbykevin.jezzin.storage.scorecard.ScoreCard;
+import com.gamesbykevin.jezzin.screen.OptionsScreen;
 import com.gamesbykevin.jezzin.screen.ScreenManager;
 
 /**
@@ -136,7 +137,7 @@ public final class Game implements IGame
      * Get the main screen object reference
      * @return The main screen object reference
      */
-    public ScreenManager getMainScreen()
+    public ScreenManager getScreen()
     {
         return this.screen;
     }
@@ -148,7 +149,7 @@ public final class Game implements IGame
         reset = true;
         
         //assign collision setting
-        getBalls().setCollision(getMainScreen().getScreenOptions().hasCollision());        
+        getBalls().setCollision(getScreen().getScreenOptions().hasCollision());        
         
         //reset player
         getPlayer().reset();
@@ -167,7 +168,7 @@ public final class Game implements IGame
         {
             //get the score reference for the current level and difficulty
             score = getScoreCard().getScore(
-                getMainScreen().getScreenOptions().getDifficultyIndex(), 
+                getScreen().getScreenOptions().getIndex(OptionsScreen.INDEX_BUTTON_DIFFICULTY), 
                 level
             );
             
@@ -180,7 +181,7 @@ public final class Game implements IGame
         }
         
         //setup game depending on mode
-        switch (getMainScreen().getScreenOptions().getModeIndex())
+        switch (getScreen().getScreenOptions().getIndex(OptionsScreen.INDEX_BUTTON_MODE))
         {
             case Player.MODE_INDEX_CASUAL:
             default:
@@ -203,13 +204,9 @@ public final class Game implements IGame
                 }
                 else
                 {
-                    //if there is no previous score we will count up
-                    getPlayer().setCountdown(false, 0);
+                    //if there is no previous score we will set a default time
+                	getPlayer().setCountdown(true, level * TIMED_DELAY_PER_BALL);
                 }
-                break;
-                
-            case Player.MODE_INDEX_TIMED:
-                getPlayer().setCountdown(true, level * TIMED_DELAY_PER_BALL);
                 break;
         }
         
@@ -248,7 +245,7 @@ public final class Game implements IGame
             if (getBoundaries() != null && !getBoundaries().hasDraw())
             {
                 if (getPlayer() != null)
-                    getPlayer().updateMotionEvent(event, x, y);
+                    getPlayer().update(event, x, y);
             }
         }
     }

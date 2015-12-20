@@ -23,6 +23,16 @@ public class MainActivity extends Activity
      * The web address where this game can be rated
      */
     public static final String WEBPAGE_RATE_URL = "https://play.google.com/store/apps/details?id=com.gamesbykevin.jezzin";
+    
+    /**
+     * The face book url
+     */
+    public static final String WEBPAGE_FACEBOOK_URL = "http://facebook.com/gamesbykevin";
+    
+    /**
+     * The twitter url
+     */
+    public static final String WEBPAGE_TWITTER_URL = "http://twitter.com/gamesbykevin";
 
     /**
      * The url that contains the instructions for the game

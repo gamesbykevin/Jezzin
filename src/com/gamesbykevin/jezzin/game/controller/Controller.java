@@ -105,6 +105,16 @@ public class Controller implements IController
         return this.game;
     }
     
+    public void reset()
+    {
+    	if (buttons != null)
+    	{
+	        //determine which button is displayed
+	        buttons.get(Assets.ImageGameKey.SoundOn).setVisible(Audio.isAudioEnabled());
+	        buttons.get(Assets.ImageGameKey.SoundOff).setVisible(!Audio.isAudioEnabled());
+    	}
+    }
+    
     /**
      * Update the controller based on the motion event
      * @param event Motion Event
@@ -122,7 +132,7 @@ public class Controller implements IController
             if (buttons.get(Assets.ImageGameKey.Pause).contains(x, y))
             {
                 //change the state to paused
-                getGame().getMainScreen().setState(ScreenManager.State.Paused);
+                getGame().getScreen().setState(ScreenManager.State.Paused);
                 
                 //event was applied
                 return true;
@@ -130,7 +140,7 @@ public class Controller implements IController
             else if (buttons.get(Assets.ImageGameKey.Exit).contains(x, y))
             {
                 //change to the exit confirm screen
-                getGame().getMainScreen().setState(ScreenManager.State.Exit);
+                getGame().getScreen().setState(ScreenManager.State.Exit);
                 
                 //event was applied
                 return true;

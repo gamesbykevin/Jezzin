@@ -35,5 +35,5 @@ public interface IPlayer extends Disposable
      * @param y (y-coordinate)
      * @throws Exception
      */
-    public void updateMotionEvent(final MotionEvent event, final float x, final float y) throws Exception;
+    public void update(final MotionEvent event, final float x, final float y) throws Exception;
 }

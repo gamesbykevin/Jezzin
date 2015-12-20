@@ -11,7 +11,6 @@ import com.gamesbykevin.androidframework.resources.Audio;
 import com.gamesbykevin.androidframework.resources.Disposable;
 import com.gamesbykevin.androidframework.resources.Images;
 import com.gamesbykevin.androidframework.screen.Screen;
-
 import com.gamesbykevin.jezzin.assets.Assets;
 import com.gamesbykevin.jezzin.panel.GamePanel;
 
@@ -69,7 +68,7 @@ public final class ScreenManager implements Screen, Disposable
     /**
      * The y-coordinate spacing between each button
      */
-    public static final int BUTTON_Y_INCREMENT = 110;
+    public static final int BUTTON_Y_INCREMENT = MenuScreen.BUTTON_HEIGHT + (MenuScreen.BUTTON_HEIGHT / 4);
     
     /**
      * The alpha visibility to apply when darkening the background
@@ -91,7 +90,7 @@ public final class ScreenManager implements Screen, Disposable
         this.background.setWidth(GamePanel.WIDTH);
         this.background.setHeight(GamePanel.HEIGHT);
 
-        //add animation to spritesheet
+        //add animation to sprite sheet
         this.background.getSpritesheet().add(Assets.ImageMenuKey.Background, new Animation(Images.getImage(Assets.ImageMenuKey.Background)));
         
         //store our game panel reference
@@ -251,7 +250,7 @@ public final class ScreenManager implements Screen, Disposable
         if (canvas != null)
         {
             //fill background
-            canvas.drawColor(Color.BLACK);
+            //canvas.drawColor(Color.BLACK);
             
             //draw the background
             background.render(canvas);

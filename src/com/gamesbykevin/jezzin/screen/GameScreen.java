@@ -39,7 +39,7 @@ public class GameScreen implements Screen, Disposable
             this.game = new Game(screen);
         
         //set the mode description
-        switch (screen.getScreenOptions().getModeIndex())
+        switch (screen.getScreenOptions().getIndex(OptionsScreen.INDEX_BUTTON_MODE))
         {
             case Player.MODE_INDEX_CASUAL:
             default:
@@ -50,17 +50,13 @@ public class GameScreen implements Screen, Disposable
                 getGame().getPlayer().setModeDesc(Player.MODE_DESC_SURVIVAL);
                 break;
                 
-            case Player.MODE_INDEX_TIMED:
-                getGame().getPlayer().setModeDesc(Player.MODE_DESC_TIMED);
-                break;
-                
             case Player.MODE_INDEX_CHALLENGE:
                 getGame().getPlayer().setModeDesc(Player.MODE_DESC_CHALLENGE);
                 break;
         }
         
         //reset the game at the user specified level
-        getGame().reset(screen.getScreenOptions().getLevelIndex() + 1);
+        getGame().reset(screen.getScreenOptions().getIndex(OptionsScreen.INDEX_BUTTON_LEVEL) + 1);
     }
     
     /**

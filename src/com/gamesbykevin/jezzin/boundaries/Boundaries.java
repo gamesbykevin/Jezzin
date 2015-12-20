@@ -1,9 +1,11 @@
 package com.gamesbykevin.jezzin.boundaries;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Vibrator;
 
 import com.gamesbykevin.androidframework.anim.Animation;
 import com.gamesbykevin.androidframework.base.Entity;
@@ -14,6 +16,7 @@ import com.gamesbykevin.jezzin.assets.Assets;
 import com.gamesbykevin.jezzin.game.Game;
 import com.gamesbykevin.jezzin.panel.GamePanel;
 import com.gamesbykevin.jezzin.player.Player;
+import com.gamesbykevin.jezzin.screen.OptionsScreen;
 import com.gamesbykevin.jezzin.screen.ScreenManager;
 
 import java.util.ArrayList;
@@ -69,6 +72,11 @@ public final class Boundaries extends Entity implements IBoundaries
      * Default bounds where the balls bounce
      */
     public static final Rect DEFAULT_BOUNDS = new Rect(10, 75, GamePanel.WIDTH - 10, GamePanel.HEIGHT - 75);
+    
+    /**
+     * The length to vibrate the phone when you lose a life (milliseconds)
+     */
+    private static final long VIBRATION_DURATION = 250;
     
     /**
      * Create new container of boundaries
@@ -335,11 +343,11 @@ public final class Boundaries extends Entity implements IBoundaries
                 if (getTotalProgress() >= Player.PROGRESS_GOAL)
                 {
                     //set the state
-                    getGame().getMainScreen().setState(ScreenManager.State.GameOver);
+                    getGame().getScreen().setState(ScreenManager.State.GameOver);
                     
                     //update the score
                     final boolean result = getGame().getScoreCard().updateScore(
-                        getGame().getMainScreen().getScreenOptions().getDifficultyIndex(), 
+                		getGame().getScreen().getScreenOptions().getIndex(OptionsScreen.INDEX_BUTTON_DIFFICULTY),
                         getGame().getPlayer().getLevel(), 
                         getGame().getPlayer().getTime()
                     );
@@ -347,12 +355,12 @@ public final class Boundaries extends Entity implements IBoundaries
                     if (result)
                     {
                         //assign message to display to user
-                        getGame().getMainScreen().getScreenGameover().setMessage("New record");
+                        getGame().getScreen().getScreenGameover().setMessage("New record");
                     }
                     else
                     {
                         //assign message to display to user
-                        getGame().getMainScreen().getScreenGameover().setMessage("You win");
+                        getGame().getScreen().getScreenGameover().setMessage("You win");
                     }
                     
                     //play sound effect
@@ -372,13 +380,23 @@ public final class Boundaries extends Entity implements IBoundaries
                     //remove a life
                     getGame().getPlayer().setLives(getGame().getPlayer().getLives() - 1);
                     
+                    //vibrate phone when losing a life (if it is enabled)
+                    if (getGame().getScreen().getScreenOptions().getIndex(OptionsScreen.INDEX_BUTTON_VIBRATE) == 0)
+                    {
+    	        		//get our vibrate object
+    	        		Vibrator v = (Vibrator) getGame().getScreen().getPanel().getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+    	        		 
+    					//vibrate for a specified amount of milliseconds
+    					v.vibrate(VIBRATION_DURATION);
+                    }
+                    
                     //if no more lives, the game is over
                     if (getGame().getPlayer().getLives() < 1)
                     {
-                        getGame().getMainScreen().setState(ScreenManager.State.GameOver);
+                        getGame().getScreen().setState(ScreenManager.State.GameOver);
                         
                         //assign message to display to user
-                        getGame().getMainScreen().getScreenGameover().setMessage("No More Lives");
+                        getGame().getScreen().getScreenGameover().setMessage("No More Lives");
                         
                         //play sound effect
                         Audio.play(Assets.AudioGameKey.NoLives);

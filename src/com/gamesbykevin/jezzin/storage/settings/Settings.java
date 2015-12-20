@@ -40,11 +40,15 @@ public final class Settings extends Internal
                 final int levelIndex = Integer.parseInt(data[2]);
                 final boolean audioEnabled = Boolean.parseBoolean(data[3]);
                 final boolean collisionEnabled = Boolean.parseBoolean(data[4]);
+                final boolean vibrateEnabled = Boolean.parseBoolean(data[5]);
 
                 //assign settings
-                screen.setDifficultyIndex(difficultyIndex);
-                screen.setModeIndex(modeIndex);
-                screen.setLevelIndex(levelIndex);
+                screen.setIndex(OptionsScreen.INDEX_BUTTON_DIFFICULTY, difficultyIndex);
+                screen.setIndex(OptionsScreen.INDEX_BUTTON_SOUND, (audioEnabled) ? 0 : 1);
+                screen.setIndex(OptionsScreen.INDEX_BUTTON_MODE, modeIndex);
+                screen.setIndex(OptionsScreen.INDEX_BUTTON_LEVEL, levelIndex);
+                screen.setIndex(OptionsScreen.INDEX_BUTTON_VIBRATE, (vibrateEnabled) ? 0 : 1);
+                
                 screen.setCollision(collisionEnabled);
                 Audio.setAudioEnabled(audioEnabled);
             }
@@ -67,11 +71,12 @@ public final class Settings extends Internal
             super.getContent().delete(0, super.getContent().length());
 
             //option settings
-            final int difficultyIndex = screen.getDifficultyIndex();
-            final int modeIndex = screen.getModeIndex();
-            final int levelIndex = screen.getLevelIndex();
+            final int difficultyIndex = screen.getIndex(OptionsScreen.INDEX_BUTTON_DIFFICULTY);
+            final int modeIndex = screen.getIndex(OptionsScreen.INDEX_BUTTON_MODE);
+            final int levelIndex = screen.getIndex(OptionsScreen.INDEX_BUTTON_LEVEL);
             final boolean audioEnabled = Audio.isAudioEnabled();
             final boolean collisionEnabled = screen.hasCollision();
+            final boolean vibrateEnabled = (screen.getIndex(OptionsScreen.INDEX_BUTTON_VIBRATE) == 0);
 
             //add the settings to the string builder
             super.getContent().append(difficultyIndex);
@@ -83,6 +88,8 @@ public final class Settings extends Internal
             super.getContent().append(audioEnabled);
             super.getContent().append(SEPARATOR);
             super.getContent().append(collisionEnabled);
+            super.getContent().append(SEPARATOR);
+            super.getContent().append(vibrateEnabled);
 
             //save data
             super.save();

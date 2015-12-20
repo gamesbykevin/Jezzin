@@ -11,6 +11,7 @@ import com.gamesbykevin.jezzin.balls.Balls;
 import com.gamesbykevin.jezzin.boundaries.Boundaries;
 import com.gamesbykevin.jezzin.game.Game;
 import com.gamesbykevin.jezzin.panel.GamePanel;
+import com.gamesbykevin.jezzin.screen.OptionsScreen;
 import com.gamesbykevin.jezzin.screen.ScreenManager;
 
 /**
@@ -74,13 +75,11 @@ public final class Player implements IPlayer
     //different mode descriptions
     public static final String MODE_DESC_CASUAL = "Casual";
     public static final String MODE_DESC_SURVIVAL = "Survival";
-    public static final String MODE_DESC_TIMED = "Timed";
     public static final String MODE_DESC_CHALLENGE = "Challenge";
     
     public static final int MODE_INDEX_CASUAL = 0;
     public static final int MODE_INDEX_SURVIVIAL = 1;
-    public static final int MODE_INDEX_TIMED = 2;
-    public static final int MODE_INDEX_CHALLENGE = 3;
+    public static final int MODE_INDEX_CHALLENGE = 2;
     
     //do we stop the timer
     private boolean stop = true;
@@ -194,7 +193,7 @@ public final class Player implements IPlayer
         this.lives = lives;
         
         if (getLives() < 0)
-            setLives(0);
+            this.lives = 0;
     }
     
     /**
@@ -276,7 +275,7 @@ public final class Player implements IPlayer
      * @param y (y-coordinate)
      * @throws Exception
      */
-    public void updateMotionEvent(final MotionEvent event, final float x, final float y) throws Exception
+    public void update(final MotionEvent event, final float x, final float y) throws Exception
     {
         //don't continue if the coordinates are outside the playable bounds
         if (x <= Boundaries.DEFAULT_BOUNDS.left || x >= Boundaries.DEFAULT_BOUNDS.right)
@@ -375,10 +374,10 @@ public final class Player implements IPlayer
             	this.setTimeDesc("00:00.000");
                 
                 //change the state to game over
-                game.getMainScreen().setState(ScreenManager.State.GameOver);
+                game.getScreen().setState(ScreenManager.State.GameOver);
                 
                 //assign message to display to user
-                game.getMainScreen().getScreenGameover().setMessage("Time up");
+                game.getScreen().getScreenGameover().setMessage("Time up");
                 
                 //play sound effect
                 Audio.play(Assets.AudioGameKey.TimeUp);
@@ -410,7 +409,8 @@ public final class Player implements IPlayer
         this.setTimeDesc(TimeFormat.getDescription(TIME_FORMAT, getTime()));
         this.setBestDesc("");
         
-        switch (game.getMainScreen().getScreenOptions().getDifficultyIndex())
+        //set the speed and description of the chosen difficulty
+        switch (game.getScreen().getScreenOptions().getIndex(OptionsScreen.INDEX_BUTTON_DIFFICULTY))
         {
             case 0:
                 setVelocity(VELOCITY_NORMAL);

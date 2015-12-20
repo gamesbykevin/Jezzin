@@ -11,6 +11,11 @@ import com.gamesbykevin.androidframework.resources.Disposable;
  */
 public interface IController extends Disposable
 {
+	/**
+	 * Make sure correct buttons are shown
+	 */
+	public void reset();
+	
     /**
      * Update logic when motion event occurs
      * @param event Motion Event

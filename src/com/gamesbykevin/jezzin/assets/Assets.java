@@ -77,6 +77,9 @@ public class Assets
         Button,
         Cancel,
         Confirm,
+        Facebook,
+        Instructions,
+        Twitter,
         Logo,
         Splash
     }
